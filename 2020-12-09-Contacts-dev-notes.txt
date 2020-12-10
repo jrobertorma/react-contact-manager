@@ -1,0 +1,37 @@
+09/12/2020
+Jajaja, perdí todas las notas anteriores (no me voy a acordar de todo T.T), porque borré todo el proyecto debido a que no jalaba (sospecho de la selección del lint-er) así que vamos a ver de qué va esta vaina.
+
+REFLEXIONES SOBRE PROYECTOS REACT-FEATHERS-MONBODB
+Normalmente harías una API con Express, en ese caso tendrías que armar los famosos modelos, sus métodos (lo que le hacen a la BD) y los endpoints asociados a los métodos para activar su función en la BD (un CRUD).
+
+Pues Feathersjs acelera ese proceso 'a la' Laravel, ya ves que le pasabas la BD, los nombres de los modelos y ya solito hacía todo el crud de manera automática.
+
+Entonces, 'recableando' un poco puedes usarlo para tu BD.
+
+MongoDB es una BD que funciona con archivos, supongo guarda las cosas en algo parecido a JSON, ammm, pues lo instalas y así.
+
+También debes instalar feathersjs y oooobviamente tener node, react y yarn (opcional) instalados.
+
+Estuve peleándome full con las versiones del Node y el condenado Yarn que quiere checar todo (tal vez no fué la mejor idea instalarlo lol), pero ya quedó, sospecho que el proyecto anterior no jaló debido a que ejecuté el create-react-app antes de instalar yarn y por eso el 'yarn start' no jalaba, pero ahora sí.
+
+BTW, yarn es un package manager, es decir una capa más al ya atascado de capas proceso de creación de apps (a veces no le veo sentido jaja, y en realidad es una herramienta pensada para proyectos con muchos módulos, dependencias y así por el estilo).
+
+
+PROYECTO CONTACTOS
+	1. Crea el proyecto con create-react-app
+	2. Crear API
+		2.1 Instalar gobalmente feathers-cli
+		2.2 Crear carpeta llamada 'backend' (o cualquier nombre lol) y mover la terminal a ese directorio
+		2.3 Crear el servidor con 'feathers generate app' //Nota que aquí eliges el linter, elegí ESLint y mocha para testing (ni idea de qué sea lol)
+		2.4 Crear rutas y modelos para los contactos (a la Laravel) con 'feathers generate service' //eliges mongoose, contact, /contacts y mongodb://localhost:27017/backend
+		2.5 Instalar extensión para validar emails con 'yarn add mongoose-type-email'
+		2.6 Instalar nodemon para no tener que reiniciar el servidor cuando modifiques algo con 'yarn add nodemon --dev'
+		2.7 Modificar backend/package.json en la línea start a "nodemon src/"
+			"scripts": {
+			    "test": "yarn run lint && yarn run mocha",
+			    "lint": "eslint src/. test/. --config .eslintrc.json --fix",
+			    "dev": "nodemon src/",
+			    "start": "node src/", /* se pasa a => "nodemon src/" */
+			    "mocha": "mocha test/ --recursive --exit"
+			  },
+		2.8 Configurar la conexión a la BD
