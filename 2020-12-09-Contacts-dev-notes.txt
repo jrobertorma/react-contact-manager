@@ -8,16 +8,18 @@ Pues Feathersjs acelera ese proceso 'a la' Laravel, ya ves que le pasabas la BD,
 
 Entonces, 'recableando' un poco puedes usarlo para tu BD.
 
-MongoDB es una BD que funciona con archivos, supongo guarda las cosas en algo parecido a JSON, ammm, pues lo instalas y así.
+MongoDB es una BD que funciona con archivos, supongo guarda las cosas en algo parecido a JSON, ammm, pues lo instalas y así (https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/).
 
-También debes instalar feathersjs y oooobviamente tener node, react y yarn (opcional) instalados.
+También debes instalar feathersjs (https://docs.feathersjs.com/) y oooobviamente tener node, react y yarn (opcional) instalados.
 
 Estuve peleándome full con las versiones del Node y el condenado Yarn que quiere checar todo (tal vez no fué la mejor idea instalarlo lol), pero ya quedó, sospecho que el proyecto anterior no jaló debido a que ejecuté el create-react-app antes de instalar yarn y por eso el 'yarn start' no jalaba, pero ahora sí.
 
-BTW, yarn es un package manager, es decir una capa más al ya atascado de capas proceso de creación de apps (a veces no le veo sentido jaja, y en realidad es una herramienta pensada para proyectos con muchos módulos, dependencias y así por el estilo).
+BTW, yarn es un package manager (https://yarnpkg.com/), es decir una capa más al ya atascado de capas proceso de creación de apps (a veces no le veo sentido jaja, y en realidad es una herramienta pensada para proyectos con muchos módulos, dependencias y así por el estilo).
+
+11/12/2020
 
 
-PROYECTO CONTACTOS
+SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
 	2. Crear API
 		2.1 Instalar gobalmente feathers-cli
@@ -34,4 +36,16 @@ PROYECTO CONTACTOS
 			    "start": "node src/", /* se pasa a => "nodemon src/" */
 			    "mocha": "mocha test/ --recursive --exit"
 			  },
-		2.8 Configurar la conexión a la BD
+		2.8 Configurar la conexión a la BD en /backend/config/default.json
+
+		2.9 Configurar modelos, para contact defines las propiedades que tendrán los "objetos" contacto, a saber: nombre, email, teléfono y fechas de creación y última modificación, esto se hace en backend/srs/models/contact.model.js (es el modelo que se creó con 'feathers generate service', revísalo para ver cómo quedó)
+
+		2.10 Ya puedes testear el endpoint para 'contacts' en 'http://localhost:3030/contacts', y si le pasas un POST con los datos adecuados (con postman) los crea en la BD (:o, feathers simplifica full las cosas XD), estamos listos para hacer el front-end y llamar a los endpoints desde react. 
+
+
+
+Comandos
+	DB run: "C:\Program Files\MongoDB\Server\4.4\bin\mongod.exe" --dbpath="c:\data\db"
+	API test: Consola en \backend, "yarn test" (lol)
+	API run: Consola en \backend, "yarn start"
+	APP run: Consola en \, "yarn start"
