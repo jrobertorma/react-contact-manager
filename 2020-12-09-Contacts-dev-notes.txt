@@ -17,10 +17,11 @@ Estuve peleándome full con las versiones del Node y el condenado Yarn que quier
 BTW, yarn es un package manager (https://yarnpkg.com/), es decir una capa más al ya atascado de capas proceso de creación de apps (a veces no le veo sentido jaja, y en realidad es una herramienta pensada para proyectos con muchos módulos, dependencias y así por el estilo).
 
 11/12/2020
-
+Pasos 2.8, 2.9, y 2.10, funcionó (lol), falta construir el front :s.
 
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
+
 	2. Crear API
 		2.1 Instalar gobalmente feathers-cli
 		2.2 Crear carpeta llamada 'backend' (o cualquier nombre lol) y mover la terminal a ese directorio
@@ -37,15 +38,45 @@ SUMARIO PROYECTO CONTACTOS
 			    "mocha": "mocha test/ --recursive --exit"
 			  },
 		2.8 Configurar la conexión a la BD en /backend/config/default.json
+		2.9 Configurar modelos, para contact defines las propiedades que tendrán los "objetos" contacto, a saber: nombre, email, teléfono y fechas de creación y última modificación, esto se hace en backend/srs/models/contact.model.js (ese es el modelo que se creó con 'feathers generate service', revísalo en el commit para ver cómo quedó)
+		2.10 Ya puedes testear el endpoint para 'contacts' en 'http://localhost:3030/contacts', y si le pasas un POST con los datos adecuados (con postman) los crea en la BD (:o, feathers simplifica full las cosas XD), estamos listos para hacer el front-end y llamar a los endpoints desde react.
 
-		2.9 Configurar modelos, para contact defines las propiedades que tendrán los "objetos" contacto, a saber: nombre, email, teléfono y fechas de creación y última modificación, esto se hace en backend/srs/models/contact.model.js (es el modelo que se creó con 'feathers generate service', revísalo para ver cómo quedó)
+		El cuerpo de la request debe llevar esto:
 
-		2.10 Ya puedes testear el endpoint para 'contacts' en 'http://localhost:3030/contacts', y si le pasas un POST con los datos adecuados (con postman) los crea en la BD (:o, feathers simplifica full las cosas XD), estamos listos para hacer el front-end y llamar a los endpoints desde react. 
+			{
+			  "name": {
+			    "first": "Joe",
+			    "last": "BTO"
+			  },
+			  "phone": "+5555555555",
+			  "email": "joe@merengues.com"
+			}
 
+		Notas sobre API: Con un comando ('generate service') Feathers hace todo el trabajo para armar un modelo y su CRUD (revisa su documentación), obviamente hay que hacer cambios (véase punto 2.10) pero ya te ayuda con buena parte del trabajo.
+		Puedes agregar tantos servicios, modelos y funciones como necesites, aunque para efectos didácticos (supongo) el libro solo muestra este ejemplo, de todos modos basta para hacer los demás si hacen falta, aquí termina la sección de la API.
+
+	3. Crear Front-End
+		3.1 Instalar dependencias para front-end (supongo son una especie de bootrsrap para react, yeiii, una capa más ahora sobre la sintáxis al crear componentes T.T, por cierto que instalas en la raíz del proyecto (no en /backend))
+			3.1.1 Instalar SemanticUI con 'yarn add semantic-ui-react semantic-ui-css' (https://react.semantic-ui.com/usage)
+			3.1.2 Instalar react-router (lo usamos en el clon de reddit) con 'yarn add react-router-dom' (https://reactrouter.com/web/guides/quick-start)
+		3.2 Agregar componetes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
+
+		Notas sobre Front-End: El código modificado en el commit del 15/12 literal fué un copy paste (lol), revísalo y modifícalo ;).
 
 
 Comandos
+	MONGODB
 	DB run: "C:\Program Files\MongoDB\Server\4.4\bin\mongod.exe" --dbpath="c:\data\db"
+	
+	API
 	API test: Consola en \backend, "yarn test" (lol)
 	API run: Consola en \backend, "yarn start"
 	APP run: Consola en \, "yarn start"
+
+	REACT
+	Start APP: Consola en \, "yarn start"
+
+	GIT
+	Stage all changes: 'git add .'
+	Commit staged changes: 'git commit -m "mensajeeee"'
+	Update repo: 'git push origin master'
