@@ -52,16 +52,254 @@ SUMARIO PROYECTO CONTACTOS
 			  "email": "joe@merengues.com"
 			}
 
-		Notas sobre API: Con un comando ('generate service') Feathers hace todo el trabajo para armar un modelo y su CRUD (revisa su documentación), obviamente hay que hacer cambios (véase punto 2.10) pero ya te ayuda con buena parte del trabajo.
-		Puedes agregar tantos servicios, modelos y funciones como necesites, aunque para efectos didácticos (supongo) el libro solo muestra este ejemplo, de todos modos basta para hacer los demás si hacen falta, aquí termina la sección de la API.
+		Notas sobre API: Con un comando ('generate service'), Feathers hace todo el trabajo para armar un modelo y su CRUD (revisa su documentación), obviamente hay que hacer cambios (véase punto 2.10) pero ya te ayuda con buena parte del trabajo.
+		Puedes agregar tantos servicios, modelos y funciones como necesites, aunque para efectos didácticos (supongo), el libro solo muestra este ejemplo, de todos modos basta para hacer los demás si hacen falta, aquí termina la sección de la API.
 
 	3. Crear Front-End
 		3.1 Instalar dependencias para front-end (supongo son una especie de bootrsrap para react, yeiii, una capa más ahora sobre la sintáxis al crear componentes T.T, por cierto que instalas en la raíz del proyecto (no en /backend))
 			3.1.1 Instalar SemanticUI con 'yarn add semantic-ui-react semantic-ui-css' (https://react.semantic-ui.com/usage)
 			3.1.2 Instalar react-router (lo usamos en el clon de reddit) con 'yarn add react-router-dom' (https://reactrouter.com/web/guides/quick-start)
-		3.2 Agregar componetes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
+		3.2 Agregar componentes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
 
-		Notas sobre Front-End: El código modificado en el commit del 15/12 literal fué un copy paste (lol), revísalo y modifícalo ;).
+		Notas sobre Front-End: El código modificado en el commit del 15/12 literal fué un copy paste (lol) lo revisé y puse algunas notas en App.js.
+
+	4. Cablear Front-end y Back-end
+		4.1 Instalar Redux (para gestión del estado, https://redux.js.org/introduction/getting-started), redux-promise-middleware (para ahorrarte trabajo con el 'handling' de los action, https://www.npmjs.com/package/redux-promise-middleware) y redux-thunk (para hacer solicitudes asíncronas a la API, https://github.com/reduxjs/redux-thunk)
+			yarn add redux react-redux redux-promise-middleware redux-thunk 
+		4.2 Para hacer las requests vamos a usar Axios(https://www.npmjs.com/package/axios) y para supervisar el comportamiento del store y las llamadas a 'dispatch' usaremos redux-devtools (https://www.npmjs.com/package/redux-devtools-extension, también instala su extensión en tu browser)
+			yarn add redux-devtools-extension axios
+
+
+
+
+
+
+		Notas sobre integración:
+			SOBRE REDUX
+			Redux es un framework de administración de estado para aplicaciones javascript. En redux tienes solo un contenedor de estados (store) para toda la aplicación (y solo uno). 
+
+			Al ser un administrador de estado, redux puede lidiar con la modificación de una parte del estado (e.g. cambiar el teléfono de un usuario). En redux, todos los cambios de estado son efectuados al enviar (dispatch) una acción (action) al store (contenedor del estado).
+
+			Las actions pueden verse como 'mensajeros' que llevan la información de los eventos que suceden en la app al store, luego, el store se encarga de actualizar su estado en función del 'mensaje' de la action. Los action son objetos que deben llevar la llave 'type' y opcionalmente más datos.
+
+				const action = {
+				  type: 'LOGIN'
+				}
+
+			para pasarlos al store (y que pueda encargarse de los cambios) se usan los 'action creators'. Un action creator es una función que retorna un action. 
+
+				// Action creator
+				function actionCreator(){ return action };
+
+			luego usas el método 'dispatch' del store para entregárselo y que haga la operación sobre el estado indicada por el valor de la llave 'type' del action.
+
+				const store = Redux.createStore(
+				  (state = {login: false}) => state
+				);
+				const loginAction = () => {
+				  return {
+				    type: 'LOGIN'
+				  }
+				};
+				// Dispatch the action here:
+				store.dispatch(loginAction());
+
+			Una vez hecho el dispatch, el store debe saber qué hacer con el 'action' indicado, para eso se usan los 'reducer', un reducer es una función pura (no cambia nada en términos globales, solo sus argumentos) que recibe un 'state' un 'action' y retorna un nuevo 'state'. 
+
+			Las funciones reducer siempre deben retornar una nueva versión del estado y nunca modificarlo directamente.
+
+			  const defaultState = {
+			    authenticated: false
+			  };//state
+			  
+			  //función reducer, nota cómo recibe el state y puede recibir un action
+			  //también tiene un switch con los action que puede recibir y qué hacer en cada caso 
+			  const authReducer = (state = defaultState, action) => {
+			    switch ( action.type ){
+			      case "LOGIN":
+			        return {
+			          authenticated: true
+			        };
+			  
+			      case "LOGOUT":
+			        return {
+			          authenticated: false
+			        };
+			  
+			      default:
+			        return defaultState;
+			    }
+			  };
+			  
+			  //nota que el createStore llama a la función reducer (authReducer)
+			  //así cuando llames a 'dispatch' (método del store) ya tienes enlazado el reducer y con él el estado
+			  const store = Redux.createStore(authReducer);
+			  
+			  //action creators
+			  const loginUser = () => {
+			    return {
+			      type: 'LOGIN'
+			    }
+			  };
+			  
+			  const logoutUser = () => {
+			    return {
+			      type: 'LOGOUT'
+			    }
+			  };
+
+			El store también tiene el método 'subscribe', que llama a una función cada vez que el estado cambia
+
+			  	const ADD = 'ADD';
+
+				const reducer = (state = 0, action) => {
+				  switch(action.type) {
+				    case ADD:
+				      return state + 1;
+				    default:
+				      return state;
+				  }
+				};
+
+				const store = Redux.createStore(reducer);
+
+				// global count variable:
+				let count = 0;
+
+				// función que incrementa la variable count, aquí puede ir lo que sea lol
+				const addOne = () => (count += 1);
+
+				//subscribe de la función addOne al store
+				store.subscribe( addOne );
+
+				//cada vez que cambie el estado (véase el 'dispatch') se llama a addOne por el 'subscribe'
+				store.dispatch({type: ADD});
+				console.log(count);
+				store.dispatch({type: ADD});
+				console.log(count);
+				store.dispatch({type: ADD});
+				console.log(count);
+
+			Para lidiar con estados complejos puedes crear múltiples funciones 'reducer' y luego concatenarlas para pasárselas a createStore
+			(recuerda que solo puede haber un estado), el método para hacerlo es combineReducers (makes sense lol).
+
+			Es buena práctica crear un reducer por cada pieza del estado que sea distinta de las otras de alguna manera. e.g. En una app de notas con autenticación de usuarios un reducer puede lidiar con la autenticación mientras otro se encarga de las notas (objeto usuario y objeto nota son fundamentalmente distintos, en keys y sus respectivos valores), en ese caso podríamos combinar los reducers así:
+
+				//authenticationReducer y notesReducer son reducers como los declarados en los ejemplos anteriores
+				const rootReducer = Redux.combineReducers({
+				  auth: authenticationReducer,
+				  notes: notesReducer
+				});
+
+			Otro ejemplo ;):
+
+				const INCREMENT = 'INCREMENT';
+				const DECREMENT = 'DECREMENT';
+
+				const counterReducer = (state = 0, action) => {
+				  switch(action.type) {
+				    case INCREMENT:
+				      return state + 1;
+				    case DECREMENT:
+				      return state - 1;
+				    default:
+				      return state;
+				  }
+				};
+
+				const LOGIN = 'LOGIN';
+				const LOGOUT = 'LOGOUT';
+
+				const authReducer = (state = {authenticated: false}, action) => {
+				  switch(action.type) {
+				    case LOGIN:
+				      return {
+				        authenticated: true
+				      }
+				    case LOGOUT:
+				      return {
+				        authenticated: false
+				      }
+				    default:
+				      return state;
+				  }
+				};
+
+				/*Aquí combinas los reducers como elementos del nuevo reducer
+				  nota que las const que los contienen nunca son llamadas por createStore
+				*/
+				const rootReducer = Redux.combineReducers(
+				  {
+				    count: counterReducer,
+				    auth: authReducer
+				  }
+				);
+
+				const store = Redux.createStore(rootReducer);
+
+			También puedes pasarle parámetros a los reducers para hacer cosas como handling de entrada de usuario y así.
+
+				const ADD_NOTE = 'ADD_NOTE';
+
+				const notesReducer = (state = 'Initial State', action) => {
+				  switch(action.type) {
+				    /* Se cacha la acción y se retorna el dato (léase entrada de usuario) como prop del parámetro action
+				       véase action.text */
+				    case ADD_NOTE:
+				    	return  action.text
+
+				    default:
+				    	return state;
+				  }
+				};
+
+				const addNoteText = (note) => {
+				  return {type: ADD_NOTE, text: note}; //el action creator retorna la action tipo ADD_NOTE y pasa un parámetro al reducer
+				};
+
+				const store = Redux.createStore(notesReducer);
+
+				console.log(store.getState());
+				store.dispatch(addNoteText('Hello!')); //le pasas al action creator un parámetro ('Hello!')
+				console.log(store.getState());
+
+		En algún punto vas a necesitar hacer llamadas asíncronas a algún recurso (sea una BD, una API, o por el estilo), para lograrlo vas a necesitar un 'middleware' diseñado para ese propósito, en este caso usaremos 'Redux Thunk'
+
+		Para incluir 'Redux Thunk' al store, lo pasas como argumento al método applyMiddleware() y a su ves se lo agregas como segundo parámetro a createStore().
+
+			const store = Redux.createStore(
+			  asyncDataReducer, //la función reducer
+			  Redux.applyMiddleware(ReduxThunk.default) //segundo parámetro con el middleware redux thunk
+			);
+
+		Luego, para crear las acciones asíncronas, usas un action creator que retorne una función que reciba 'dispatch' como argumento (lol), dentro de esa función puedes hacer dispatch a otras acciones y hacer solicitudes asíncronas a los recursos de terceros.
+
+			//action creator que retorna una función que recibe dispatch como argumento
+			const handleAsync = () => {
+			  return function(dispatch) {
+			    // dispatch request action here
+			    dispatch(requestingData()); //recuerda que los dispatch reciben action creators con la llave 'type'
+			    							// lo que le permite saber al reducer qué hacer con el estado
+
+			    setTimeout(function() {
+			      //el setTimeout simula la solicitud asíncrona que devuelve los valores de 'data'
+			      let data = {
+			        users: ['Jeff', 'William', 'Alice']
+			      }
+			      dispatch(receivedData(data)); //llamas a dispatch y le pasas un action creator distinto
+			      								//en este caso puede ser el que actualiza el estado para pintar a 'data'
+			      								//nota que le pasa 'data' como parámetro, lo que indica que el reducer va a usar esos datos
+			    }, 2500);
+			  }
+			};
+
+
+		Yyyyyy eso es todo (de momento) para redux :s.
+
+
+
+
+				  			
 
 
 Comandos
