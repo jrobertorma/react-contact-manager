@@ -19,16 +19,31 @@ BTW, yarn es un package manager (https://yarnpkg.com/), es decir una capa más a
 11/12/2020
 Pasos 2.8, 2.9, y 2.10, funcionó (lol), falta construir el front :s.
 
+12-14/12/2020
+Pasos 3.1 y 3.2, yasta, falta redux :ss.
+
+15-22/12/2020
+Revisión de notas sobre redux, y pasos 4.1 y 4.2, estamos listos para llenar los archivos de redux.
+
+23-25/12/2020
+Archivos para redux y sus dependencias.
+
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
 
 	2. Crear API
 		2.1 Instalar gobalmente feathers-cli
+		
 		2.2 Crear carpeta llamada 'backend' (o cualquier nombre lol) y mover la terminal a ese directorio
-		2.3 Crear el servidor con 'feathers generate app' //Nota que aquí eliges el linter, elegí ESLint y mocha para testing (ni idea de qué sea lol)
+		
+		2.3 Crear el servidor con 'feathers generate app' //Nota que aquí eliges el linter, elegí ESLint y mocha para testing (ni idea de qué sea mocha lol)
+		
 		2.4 Crear rutas y modelos para los contactos (a la Laravel) con 'feathers generate service' //eliges mongoose, contact, /contacts y mongodb://localhost:27017/backend
+		
 		2.5 Instalar extensión para validar emails con 'yarn add mongoose-type-email'
+		
 		2.6 Instalar nodemon para no tener que reiniciar el servidor cuando modifiques algo con 'yarn add nodemon --dev'
+		
 		2.7 Modificar backend/package.json en la línea start a "nodemon src/"
 			"scripts": {
 			    "test": "yarn run lint && yarn run mocha",
@@ -37,8 +52,11 @@ SUMARIO PROYECTO CONTACTOS
 			    "start": "node src/", /* se pasa a => "nodemon src/" */
 			    "mocha": "mocha test/ --recursive --exit"
 			  },
+		
 		2.8 Configurar la conexión a la BD en /backend/config/default.json
+		
 		2.9 Configurar modelos, para contact defines las propiedades que tendrán los "objetos" contacto, a saber: nombre, email, teléfono y fechas de creación y última modificación, esto se hace en backend/srs/models/contact.model.js (ese es el modelo que se creó con 'feathers generate service', revísalo en el commit para ver cómo quedó)
+		
 		2.10 Ya puedes testear el endpoint para 'contacts' en 'http://localhost:3030/contacts', y si le pasas un POST con los datos adecuados (con postman) los crea en la BD (:o, feathers simplifica full las cosas XD), estamos listos para hacer el front-end y llamar a los endpoints desde react.
 
 		El cuerpo de la request debe llevar esto:
@@ -56,25 +74,40 @@ SUMARIO PROYECTO CONTACTOS
 		Puedes agregar tantos servicios, modelos y funciones como necesites, aunque para efectos didácticos (supongo), el libro solo muestra este ejemplo, de todos modos basta para hacer los demás si hacen falta, aquí termina la sección de la API.
 
 	3. Crear Front-End
-		3.1 Instalar dependencias para front-end (supongo son una especie de bootrsrap para react, yeiii, una capa más ahora sobre la sintáxis al crear componentes T.T, por cierto que instalas en la raíz del proyecto (no en /backend))
+		3.1 Instalar dependencias para front-end (supongo son una especie de bootstrap para react, yeiii, una capa más ahora sobre la sintáxis al crear componentes T.T, por cierto que instalas en la raíz del proyecto (no en /backend))
 			3.1.1 Instalar SemanticUI con 'yarn add semantic-ui-react semantic-ui-css' (https://react.semantic-ui.com/usage)
 			3.1.2 Instalar react-router (lo usamos en el clon de reddit) con 'yarn add react-router-dom' (https://reactrouter.com/web/guides/quick-start)
+		
 		3.2 Agregar componentes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
 
 		Notas sobre Front-End: El código modificado en el commit del 15/12 literal fué un copy paste (lol) lo revisé y puse algunas notas en App.js.
 
-	4. Cablear Front-end y Back-end
-		4.1 Instalar Redux (para gestión del estado, https://redux.js.org/introduction/getting-started), redux-promise-middleware (para ahorrarte trabajo con el 'handling' de los action, https://www.npmjs.com/package/redux-promise-middleware) y redux-thunk (para hacer solicitudes asíncronas a la API, https://github.com/reduxjs/redux-thunk)
+		3.3 Instalar Redux (para gestión del estado, https://redux.js.org/introduction/getting-started), redux-promise-middleware (para ahorrarte trabajo con el 'handling' de los action, https://www.npmjs.com/package/redux-promise-middleware) y redux-thunk (para hacer solicitudes asíncronas a la API, https://github.com/reduxjs/redux-thunk)
 			yarn add redux react-redux redux-promise-middleware redux-thunk 
-		4.2 Para hacer las requests vamos a usar Axios(https://www.npmjs.com/package/axios) y para supervisar el comportamiento del store y las llamadas a 'dispatch' usaremos redux-devtools (https://www.npmjs.com/package/redux-devtools-extension, también instala su extensión en tu browser)
+		
+		3.4 Para hacer las requests vamos a usar Axios(https://www.npmjs.com/package/axios) y para supervisar el comportamiento del store y las llamadas a 'dispatch' usaremos redux-devtools (https://www.npmjs.com/package/redux-devtools-extension, también instala su extensión en tu browser)
 			yarn add redux-devtools-extension axios
+		
+		3.5 Crear archivos para ingregar redux con react
+			contact-data.js /*Tiene un array (llamado 'contacts') con objetos 'contacto' (id, name, phone, email), ahorita está hardcodeado para hacer pruebas*/
+			
+			actions/contact-actions.js /*Exporta una función (fetchContacts()) que puede ser llamada asíncronamente para traerse los valores de contact-data y pasarlos al reducer (reducers/contact-reducer), incluye el action creator y el dispatch, solo hay que llamarla*/
+			
+			reducers/contact-reducer /*Función reducer para los contactos, el primer caso es el que cacha el action type FETCH_CONTACTS, que concatena al estado los valores que retorne la función fetchContacts()*/
 
+			reducers/index.js /*concatena los reducers y los exporta listos para pasarlos al store*/
 
+			store.js /* Creación del store */
 
+			index.js /* Agregar store al componente <App/> para poder usarlo en todos lados*/
 
+		4. Cablear Front-end y Back-end
+
+			AQUÍ VAS
 
 
 		Notas sobre integración:
+		
 			SOBRE REDUX
 			Redux es un framework de administración de estado para aplicaciones javascript. En redux tienes solo un contenedor de estados (store) para toda la aplicación (y solo uno). 
 
@@ -263,9 +296,9 @@ SUMARIO PROYECTO CONTACTOS
 				store.dispatch(addNoteText('Hello!')); //le pasas al action creator un parámetro ('Hello!')
 				console.log(store.getState());
 
-		En algún punto vas a necesitar hacer llamadas asíncronas a algún recurso (sea una BD, una API, o por el estilo), para lograrlo vas a necesitar un 'middleware' diseñado para ese propósito, en este caso usaremos 'Redux Thunk'
+		Eventualmente vas a necesitar hacer llamadas asíncronas a algún recurso (sea una BD, una API, o por el estilo), para lograrlo vas a necesitar un 'middleware' diseñado para ese propósito, en este caso usaremos 'Redux Thunk'
 
-		Para incluir 'Redux Thunk' al store, lo pasas como argumento al método applyMiddleware() y a su ves se lo agregas como segundo parámetro a createStore().
+		Para incluir 'Redux Thunk' al store, lo pasas como argumento al método applyMiddleware() y a su vez, lo agregas como segundo parámetro a createStore().
 
 			const store = Redux.createStore(
 			  asyncDataReducer, //la función reducer
@@ -293,14 +326,61 @@ SUMARIO PROYECTO CONTACTOS
 			  }
 			};
 
+		SOBRE EL CREATE STORE DEL PROYECTO
+		Usamos redux dev tools, en su documentación está este ejemplo de configuración inicial:
 
-		Yyyyyy eso es todo (de momento) para redux :s.
+			import { createStore, applyMiddleware } from 'redux';
+			import { composeWithDevTools } from 'redux-devtools-extension';
 
+			const store = createStore(reducer, composeWithDevTools(
+			  applyMiddleware(...middleware),
+			  // other store enhancers if any
+			));
 
+		Y es más o menos lo que el libro traía:
 
+			import { applyMiddleware, createStore } from "redux";
+			import thunk from "redux-thunk";
+			import promise from "redux-promise-middleware";
+			import { composeWithDevTools } from "redux-devtools-extension"
+			import rootReducer from "./reducers";
 
-				  			
+			const middleware = composeWithDevTools(applyMiddleware(promise(),thunk))
 
+			export default createStore(rootReducer,middleware);
+
+		Nota la constante middleware que con composeWithDevTools() invoca los middleware que vamos a usar; promise y thunk,
+		luego se los pasa createStore() como segundo argumento, el primero es el stack de reducers de reducers/index.js (nota el import
+		que no especifica la ruta completa, solo la carpeta './reducers', :o)
+
+		Por cierto que el código da error XD, debes quitarle los paréntesis a 'promise()' para que funcione, en la documentación de redux-promise-middleware (https://github.com/pburtchaell/redux-promise-middleware/blob/HEAD/docs/introduction.md) está:
+
+			import promise from 'redux-promise-middleware'
+
+			composeStoreWithMiddleware = applyMiddleware(
+			  promise,
+			)(createStore);
+
+		Que es otra sintáxis para crear stores, pero lo que nos interesa es que el argumento 'promise' de applyMiddleware no lleva los paréntesis de función, probé a quitárselos en el código y jaló :).
+
+		SOBRE EL 'SPREAD OPERATOR'
+		Es una 'sintáxis' que permite invocar todos los elementos de un elemento iterable (léase array o string), y modificarlo (o no) uno por uno.
+
+		Es usada comúnmente para agregar un nuevo elemento a un contenedor de datos local (de nuevo un array XD) o pintar todos los valores del array
+		más (+) un nuevo elemento.
+
+		Un ejemplo (muy simple) de esto es:
+
+			let numberStore = [0, 1, 2];
+			let newNumber = 12;
+			numberStore = [...numberStore, newNumber];
+			//numberStore ahora es [0,1,2,12]
+
+		Cada vez que llames la sintaxis con el spread operator (los tres puntos antes del nombre del array e.g.: ...numberStore)
+		se va a agregar un 12 al final del array.
+
+		Nota que se tuvo que hacer la asignación de numberStore a lo que retorne el 'spread operator', pues no modifica el array original
+		(por eso se lleva bien con redux y la programación funcional en general).
 
 Comandos
 	MONGODB
