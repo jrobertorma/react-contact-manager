@@ -28,6 +28,9 @@ Revisión de notas sobre redux, y pasos 4.1 y 4.2, estamos listos para llenar lo
 23-25/12/2020
 Archivos para redux y sus dependencias.
 
+26-29/12/2020
+Conectar redux y react, la conexión está lista.
+
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
 
@@ -366,7 +369,7 @@ SUMARIO PROYECTO CONTACTOS
 		SOBRE EL 'SPREAD OPERATOR'
 		Es una 'sintáxis' que permite invocar todos los elementos de un elemento iterable (léase array o string), y modificarlo (o no) uno por uno.
 
-		Es usada comúnmente para agregar un nuevo elemento a un contenedor de datos local (de nuevo un array XD) o pintar todos los valores del array
+		Es usada comúnmente para agregar un nuevo elemento a un contenedor de datos local (de nuevo un array) o pintar todos los valores del array
 		más (+) un nuevo elemento.
 
 		Un ejemplo (muy simple) de esto es:
@@ -381,6 +384,93 @@ SUMARIO PROYECTO CONTACTOS
 
 		Nota que se tuvo que hacer la asignación de numberStore a lo que retorne el 'spread operator', pues no modifica el array original
 		(por eso se lleva bien con redux y la programación funcional en general).
+
+		SOBRE CABLEADO REACT-REDUX
+		En index.js habíamos habilitado redux como 'wrapper' de la app (el componente <Provider store={store}>), pero necesitas especificar qué partes del state y qué actions vas a ocupar en cada componente, para eso están las funciones mapStateToProps() y mapDispatchToProps(),
+
+			function mapStateToProps( state ){
+			   //Se recibe el state como argumento y se pasa como valor de la llave messages
+			   //nota que solo es así para este caso, en teoría podrías decidir qué partes
+			   //del state vas a pasar como props al componente
+			  return { messages: state };
+			}
+
+		mapDispatchToProps(), Es usada para pasarle 'action creators' específicos a los componentes react para que puedan hacer sus dispatch asociados al store. Retorna un objeto que mapea los dispatch con props de componente react (de ahí el nombre lol), pero en vez de regresar una parte del estado (como mapStateToProps), cada prop retorna una función que llama el dispatch con su action creator y cualquier dato (argumento) necesario. 
+
+			//La función recibe dispatch, para poder pasárlo a las props y que el componente pueda llamarlo
+			function mapDispatchToProps( dispatch ){
+			  //Va a regresar un objeto con la prop submitNewMessage (que será llamada desde el componente)
+			  //y recibe el argumento(parámetro) message que a su vez ejecuta el dispatch (definido en otro lado XD)
+			  return {
+			  	submitNewMessage: function (message) {
+			      					dispatch( addMessage(message) );
+			    				  } 
+			  };
+			}
+
+		Ahora con las funciones listas, puedes pasárselas a un componente react para que las use y así conectar react y redux (al fin XD), para eso sirve el método 'connect()' de redux (naturalmente tienes que importarlo), este método recibe tres argumentos, los primeros dos opcionales que son mapStateToProps y mapDispatchToProps, el tercero es el componente, los 'map' son opcionales porque puede que necesites un componente que solo traiga cosas del estado pero no dispatch o visceversa. La sintáxis eso sí, es un tanto atípica:
+
+			 connect(mapStateToProps, mapDispatchToProps)(MyComponent)
+
+		Si quieres omitir uno de los argumentos opcionales pasas 'null' en su lugar.
+
+		Todo en un ejemplo se vería así:
+
+
+		//Action creator
+		const addMessage = (message) => {
+		  return {
+		    type: 'ADD',
+		    message: message
+		  }
+		};
+
+		//función mapstatetoprops (duh), para pasar el estado como una prop al componente
+		const mapStateToProps = (state) => {
+		  return {
+		    messages: state
+		  }
+		};
+
+		//función mapdispatchtoprops (duh again), para pasar actions como una prop al componente
+		const mapDispatchToProps = (dispatch) => {
+		  return {
+		    submitNewMessage: (message) => {
+		      dispatch(addMessage(message));
+		    }
+		  }
+		};
+
+		//definición del componente
+		class Presentational extends React.Component {
+		  constructor(props) {
+		    super(props);
+		  }
+		  render() {
+		    return <h3>This is a Presentational Component</h3>
+		  }
+		};
+
+		const connect = ReactRedux.connect;
+
+		//Conectando el componente, es importante pasarlo a una variable
+		const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Presentational);
+
+		Y ahora puedes usar las props definidas en las funciones map. Así puedes pintar datos en función del store redux y modificar el store desde el componente ;).
+
+		SOBRE VALIDACIÓN DE TIPOS PARA PROPS
+		En el libro a veces se valida que las props pasadas a un componente tengan ciertas propiedades (e.g. que la prop sea un objeto y que es requerida), googleando la sintáxis, la forma de hacer esto ha cambiado (https://es.reactjs.org/docs/typechecking-with-proptypes.html.
+
+		Ahora debes instalar prop-types, (una más T.T).
+
+			npm install --save prop-types
+			yarn add prop-types
+
+		Luego la importas al componente
+
+			import PropTypes from 'prop-types'; // ES6
+
+		Y ya la puedes usar (véase la documentación, https://www.npmjs.com/package/prop-types).
 
 Comandos
 	MONGODB
