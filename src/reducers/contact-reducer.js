@@ -10,6 +10,14 @@ export default (state = defaultState, action) => {
             contacts: action.payload
           }
         }
+
+        case 'FETCH_CONTACTS_FULFILLED': {
+          return {
+            ...state,
+            contacts: action.payload.data.data || action.payload.data //si la paginación está desactivada (or)
+          }
+        }
+        
         default:
           return state;
     }
@@ -23,4 +31,6 @@ export default (state = defaultState, action) => {
  *      nota el 'spread operator' (...state, contacts: action.payload) significa: 
  *      'Concatena a una copia del state, lo que devuelva action.payload' (revisa las notas de desarrollo)
  *      luego lo retornas como el nuevo state.
+ * 
+ * 'FETCH_CONTACTS_FULFILLED' cacha las respuestas de la API para fetchContacts (cuando ya no llama al archivo local, más bien al endpoint)
  */

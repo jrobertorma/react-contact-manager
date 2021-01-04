@@ -1,16 +1,21 @@
-import { contacts } from '../contact-data';
+//import { contacts } from '../contact-data'; //datos hardcodeados para pruebas
+import { client } from './'; //llamas a actions/index.js, la verdad preferiría ponerle un nombre menos ambiguo T.T, es la conexión al servidor local
+
+const url = '/contacts';
 
 export function fetchContacts() {
     return (dispatch) => {
         dispatch({
             type: 'FETCH_CONTACTS',
-            payload: contacts
+            payload: client.get(url)
         })
     };
 }
 
 /**
  * Primero importas los objetos 'contact', en la primera versión llamas al archivo contact-data, eventualmente vas a llamar a la API (supongo)
+ * Sí, ahora llamas a la conexión (actions/index.js) y luego la usas en payload pasándole la url 'contacts', no olvides que esa es la url de 
+ * la API creada con feathers.js en backend/models/contact.model.js ;). 
  * 
  * Luego creas (y exportas) la función fetchContacts()
  * que permíte hacer una llamada asíncrona al store (por eso el return de una arrow function que recibe dispatch como argumento, línea 4), 

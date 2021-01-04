@@ -28,8 +28,11 @@ Revisión de notas sobre redux, y pasos 4.1 y 4.2, estamos listos para llenar lo
 23-25/12/2020
 Archivos para redux y sus dependencias.
 
-26-29/12/2020
-Conectar redux y react, la conexión está lista.
+26-31/12/2020
+Conectar redux y react, la conexión está lista. Se modificó el componente que pinta contactos, ahora tiene cards de react-ui.
+
+01-04/01/2020
+Conectar con la API y actualizar los archivos relacionados con 'fetchContacts'.
 
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
@@ -82,8 +85,15 @@ SUMARIO PROYECTO CONTACTOS
 			3.1.2 Instalar react-router (lo usamos en el clon de reddit) con 'yarn add react-router-dom' (https://reactrouter.com/web/guides/quick-start)
 		
 		3.2 Agregar componentes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
-
-		Notas sobre Front-End: El código modificado en el commit del 15/12 literal fué un copy paste (lol) lo revisé y puse algunas notas en App.js.
+			La 'arquitectura' de la app va así:
+ 			
+ 			index.js --> App.js
+               --> ContactListPage (pages/contact-list-page, la lista de contactos)
+                   --> Pinta unos textos y llama a ContactList (/components/contact-list), es un componente porque va a tener states (creo lol)
+               --> ContactFormPage (/contacts/new, agregar nuevo contacto)
+                   --> Pinta algún texto y llama a ContactForm (/components/contact-form), va a ser componente controlado porque es un formulario
+               --> ContactFormPage (aún no se pinta, pero es la ruta para actualizar contactos, llama al mismo form (de ahí el mismo nombre de componente))
+                   --> Es el mismo component de /contacts/new
 
 		3.3 Instalar Redux (para gestión del estado, https://redux.js.org/introduction/getting-started), redux-promise-middleware (para ahorrarte trabajo con el 'handling' de los action, https://www.npmjs.com/package/redux-promise-middleware) y redux-thunk (para hacer solicitudes asíncronas a la API, https://github.com/reduxjs/redux-thunk)
 			yarn add redux react-redux redux-promise-middleware redux-thunk 
@@ -104,10 +114,19 @@ SUMARIO PROYECTO CONTACTOS
 
 			index.js /* Agregar store al componente <App/> para poder usarlo en todos lados*/
 
-		4. Cablear Front-end y Back-end
+	4. Cablear Front-end y Back-end
+		4.1 Agregar redux a los componentes, se usa la función 'connect()' de redux que recibe como parámetros las funciones 'mapStateToProps()' y 'mapDispatchToProps()' y el componente a integrar con redux.
+			4.1.1 El primer componente en ser integrado es pages/contact-list-page.js, que se creó en el punto 3.2, ver comentario y notas en 'SOBRE CABLEADO REACT-REDUX'
 
-			AQUÍ VAS
+		4.2 Configurar Axios para conectarse con el back-end, a fin de poder conectarnos con la BD e implementar un CRUD sobre ella.
+			archivo actions/index.js (es la conexión, 'a la' PHP)
 
+		4.3 Actualizar componentes y reducer para llamar a la API
+			4.3.1 actions/contact-actions.js ahora llama a la conexión creada en 4.2 y pasa a payload lo que retorna el endpoint de API '/contacts'
+			4.3.2 reducers/contact-reducer.js ahora tiene un nuevo case para "FETCH_CONTACTS_FULFILLED" que hace mas o menos lo mismo que el primero
+
+		4.4 Crear formulario para el evento 'create' de los contactos (véanse las notas en 'SOBRE FORMULARIOS')
+			4.4.1  
 
 		Notas sobre integración:
 		
@@ -416,7 +435,6 @@ SUMARIO PROYECTO CONTACTOS
 
 		Todo en un ejemplo se vería así:
 
-
 		//Action creator
 		const addMessage = (message) => {
 		  return {
@@ -459,11 +477,14 @@ SUMARIO PROYECTO CONTACTOS
 		Y ahora puedes usar las props definidas en las funciones map. Así puedes pintar datos en función del store redux y modificar el store desde el componente ;).
 
 		SOBRE VALIDACIÓN DE TIPOS PARA PROPS
-		En el libro a veces se valida que las props pasadas a un componente tengan ciertas propiedades (e.g. que la prop sea un objeto y que es requerida), googleando la sintáxis, la forma de hacer esto ha cambiado (https://es.reactjs.org/docs/typechecking-with-proptypes.html.
+		En el libro a veces se valida que las props pasadas a un componente tengan ciertas propiedades (e.g. que la prop sea un objeto y que es requerida), googleando la sintáxis, la forma de hacer esto ha cambiado (https://es.reactjs.org/docs/typechecking-with-proptypes.html)
 
 		Ahora debes instalar prop-types, (una más T.T).
 
 			npm install --save prop-types
+			
+			or
+
 			yarn add prop-types
 
 		Luego la importas al componente
@@ -471,6 +492,25 @@ SUMARIO PROYECTO CONTACTOS
 			import PropTypes from 'prop-types'; // ES6
 
 		Y ya la puedes usar (véase la documentación, https://www.npmjs.com/package/prop-types).
+
+		SOBRE AXIOS
+		Axios es un cliente http basado en promesas que permite hacer 'requests' a servidores nodejs, es decir que hace el equivalente a GET, POST, etc. de PHP para entornos construidos sobre nodejs.
+
+		https://www.npmjs.com/package/axios
+
+		las request son full de legibles XD, ahora puedes incorporarlas a los dispatch para hacer el CRUD sobre la BD desde el front (:o), nota que hay que echar a andar todo, el servidor de BD (mongo), el servidor de la API (feathers) y la app react.
+
+		SOBRE FORMULARIOS
+		Todo método de entrada de usuario debe estar blindado tanto contra ataques maliciosos como contra usuarios despistados (lul), la forma más común para solucionar ambos casos en formularios es la validación de sus campos, cuando trabajas con un entorno API(backend) | UI(frontend), las entradas se deben validar en ambos lados. Las validaciones del lado del cliente permiten 'parsear' la entrada de usuario antes de que llame a nadie y también obligan al usuario a llenar los campos que necesite el desarrollador. El backend vuelve a parsear la entrada del usuario y lidia con la generación de errores, es necesario habilitar la comunicación entre ambas capas para que el usuario sepa qué está pasando con su entrada.
+
+		Y como todo eso requiere mucho trabajo y es una tarea más o menos parecida entre todos los formularios, existen librerías que facilitan todo ese asunto.
+
+		Redux-Form (antes, ahora vamos a usar 'React-final-form') y Classnames
+
+		React-final-form es el heredero de redux-form y es la solución sugerida por su creador si estás desarrollando desde cero (sus motivos tendrá lol https://final-form.org/docs/react-final-form/philosophy).
+
+		Classnames permite generar nombres de clases (really? haha) y agregarlas a componentes react dinámicamente, e.g. crear un nombre de clase para errores previamente contemplado en los estilos y así resaltar errores de entrada de usuario (https://www.npmjs.com/package/classnames).
+
 
 Comandos
 	MONGODB
