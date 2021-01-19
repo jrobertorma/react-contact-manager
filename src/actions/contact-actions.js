@@ -12,6 +12,22 @@ export function fetchContacts() {
     };
 }
 
+export function newContact() {
+    return dispatch => {
+        dispatch({
+            type: 'NEW_CONTACT'
+        })
+    }
+}
+
+export function saveContact(contact) {
+    return dispatch => {
+        return dispatch({
+            type: 'SAVE_CONTACT',
+            payload: client.post(url, contact)
+        })
+    }
+}
 /**
  * Primero importas los objetos 'contact', en la primera versión llamas al archivo contact-data, eventualmente vas a llamar a la API (supongo)
  * Sí, ahora llamas a la conexión (actions/index.js) y luego la usas en payload pasándole la url 'contacts', no olvides que esa es la url de 
@@ -21,4 +37,6 @@ export function fetchContacts() {
  * que permíte hacer una llamada asíncrona al store (por eso el return de una arrow function que recibe dispatch como argumento, línea 4), 
  * hace un dispatch del action 'FETCH_CONTACTS' (se ahorra la creación del 'action creator' si se pasa el objeto directamente)
  * y pasa los contactos como el argumento 'payload', que vas a cachar en la función reducer (véase reducers/contact.reducer.js).
+ * 
+ * client.get(url) y client.post(url, contact), son llamadas a una conexión 'axios' que llama a los endpoints de la API que está en /backend
  */

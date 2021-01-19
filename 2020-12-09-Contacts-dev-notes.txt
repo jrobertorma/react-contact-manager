@@ -34,6 +34,12 @@ Conectar redux y react, la conexión está lista. Se modificó el componente que
 01-04/01/2020
 Conectar con la API y actualizar los archivos relacionados con 'fetchContacts'.
 
+04-14/01/2020
+Formulario (está densoooo T.T), desinstalamos semantic-ui-react y semantic-ui-css para usar Material-UI (verás las razones en las notas de los formularios).
+
+15-19/01/2020
+Reescribir componentes para material-ui
+
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
 
@@ -82,6 +88,8 @@ SUMARIO PROYECTO CONTACTOS
 	3. Crear Front-End
 		3.1 Instalar dependencias para front-end (supongo son una especie de bootstrap para react, yeiii, una capa más ahora sobre la sintáxis al crear componentes T.T, por cierto que instalas en la raíz del proyecto (no en /backend))
 			3.1.1 Instalar SemanticUI con 'yarn add semantic-ui-react semantic-ui-css' (https://react.semantic-ui.com/usage)
+				IMPORTANTE: Ya no vamos a usar SemanticUI, lo sustituiremos por Material-UI (https://material-ui.com/getting-started/installation/)
+				'yarn add @material-ui/core'
 			3.1.2 Instalar react-router (lo usamos en el clon de reddit) con 'yarn add react-router-dom' (https://reactrouter.com/web/guides/quick-start)
 		
 		3.2 Agregar componentes para mostrar los contactos (un 'reporte') y para recibirlos/guardarlos (un 'insert/update').
@@ -121,12 +129,25 @@ SUMARIO PROYECTO CONTACTOS
 		4.2 Configurar Axios para conectarse con el back-end, a fin de poder conectarnos con la BD e implementar un CRUD sobre ella.
 			archivo actions/index.js (es la conexión, 'a la' PHP)
 
-		4.3 Actualizar componentes y reducer para llamar a la API
+		4.3 Actualizar componentes y reducer para llamar a la API para el listado de los contactos
 			4.3.1 actions/contact-actions.js ahora llama a la conexión creada en 4.2 y pasa a payload lo que retorna el endpoint de API '/contacts'
 			4.3.2 reducers/contact-reducer.js ahora tiene un nuevo case para "FETCH_CONTACTS_FULFILLED" que hace mas o menos lo mismo que el primero
 
-		4.4 Crear formulario para el evento 'create' de los contactos (véanse las notas en 'SOBRE FORMULARIOS')
-			4.4.1  
+		4.4 Construir formulario para la creación de nuevos contactos (véanse las notas en 'SOBRE FORMULARIOS')
+			4.4.1 Instalar 'react-final-form' (validación y gestión de formularios)		
+				yarn add final-form react-final-form
+				
+			4.4.2 Llenar archivos empleados en el flujo de datos para 'formulario de nuevo contacto'
+				contact-actions.js, ahora exporta dos nuevas funciones: newContact() y saveContact(contact), ambas incluyen el action creator y el dispatch en su definición (Los action types son: NEW_CONTACT, y SAVE_CONTACT respectivamente, debes cacharlos en la función reducer)
+                
+                contact-reducer.js, ahora tiene los casos adecuados para las action creadas en el paso anterior
+                
+                ContactForm (/components/contact-form) ahora tiene el layout de un formulario (react-final-form)
+
+                VAS AQUI: Hay que arreglar todos los componentes para que usen material-ui, luego puedes seguir con el formulario.
+
+                		https://material-ui.com/getting-started/example-projects/
+                		https://codesandbox.io/s/react-final-form-material-ui-example-tqv09?file=/src/index.jsx
 
 		Notas sobre integración:
 		
@@ -507,10 +528,372 @@ SUMARIO PROYECTO CONTACTOS
 
 		Redux-Form (antes, ahora vamos a usar 'React-final-form') y Classnames
 
-		React-final-form es el heredero de redux-form y es la solución sugerida por su creador si estás desarrollando desde cero (sus motivos tendrá lol https://final-form.org/docs/react-final-form/philosophy).
-
 		Classnames permite generar nombres de clases (really? haha) y agregarlas a componentes react dinámicamente, e.g. crear un nombre de clase para errores previamente contemplado en los estilos y así resaltar errores de entrada de usuario (https://www.npmjs.com/package/classnames).
 
+		React-final-form es el heredero de redux-form y es la solución sugerida por su creador si estás desarrollando desde cero (sus motivos tendrá lol https://final-form.org/docs/react-final-form/philosophy). La verdad nos enfrentamos a una disyunción interesante, si usas redux-form podrás importar un reducer y gestionar ambos lados de la app, si optas por elegir react-final-form no podrás validar desde el backend, al menos de forma automática (revisa los docs).
+
+		En la documentación dice que el único motivo por el cual desearías tener los datos del 'final-form' en redux, es si los necesitas disponibles 'afuera' del formulario, y hay 'artificios' para hacerlo, pero no podrás cambiar ni el estado, ni los datos en redux, ni los datos del formulario, si necesitas mutarlos mediante 'dispatchs' (mira ese plural) al store probablemente sea mejor que uses 'redux form'.
+
+		No vamos a mutar las entradas nunca, pero sí necesitamos cachar (y generar) respuestas de error desde el backend.
+
+		SOBRE REACT FINAL FORMS
+		La librería ayuda a gestionar formularios, tiene un montón de cosas y formas de ser 'tuneada' (odio esa palabra), el caso es que sirve para nuestros propósitos, a saber, generar un formulario para el alta de contactos de la APP, debe validar las entradas del usuario y también las respuestas del Backend, y aquí entramos en territorios inexplorados porque el 'cómo' es distinto al del libro, encontré en la documentación dos ejemplos que nos pueden servir:
+
+			1. Validación asíncrona de campos (https://codesandbox.io/s/wy7z7q5zx5?file=/index.js)
+			2. Cachando errores del servidor (https://codesandbox.io/s/github/final-form/react-final-form/tree/master/examples/submission-errors?from-embed)
+
+		Antes de revisarlos hay que entender la API de la librería:
+
+			<Form/>, wrapper del formulario (no te lo esperabas, ha?), gestiona todo el estado del form y puede pasarle props (estados y funcionalidades) a sus hijos. Las dos props requeridas son onSubmit y una para pintar que puede ser component, render o children, la práctica recomendada es usar render para que no se pinte en el dom (y sea inspeccionable).
+
+			onSubmit es una función que es llamada cuando se envía el formulario y pasa las validaciones (véase <Field/>) y recibe los valores del mismo (de sus campos).
+
+			También pasa handleSubmit a la función render, este método está diseñado para ser pasado como el onSubmit del componente HTML <form>, y es que llama a e.preventDefault() para que no se recargue la página (old school is cool).
+
+			En la práctica todos los formularios llevan esta estructura:
+
+				<Form onSubmit={onSubmit}>
+				  {props => (
+				    <form onSubmit={props.handleSubmit}>
+
+				      ... fields go here...
+
+				      <button type="submit">Submit</button>
+				    </form>
+				  )}
+				</Form>
+
+			https://final-form.org/docs/react-final-form/api/Form
+
+			En https://final-form.org/docs/react-final-form/types/FormProps están todas las props que puede recibir un formulario, entre las más usadas están:
+
+				validate: opcional, debe ser una función que valida todos los campos y retorne errores de validación. Se puede escribir de manera asíncrona (usando promesas) o no (con un return a la old school).
+
+				onSubmit: requerida, función llamada cuando el formulario se envía sin errores, puede ser asíncrona (promesas 'or' callbacks ) o no.
+
+				render: Forma recomendada para pintar un formulario, recibe una arrow function que especifica los contenidos del formulario, recibe todas las props FormRenderProps así como todas las props que no sean de la API que se definieron en el componente <Form/>.
+
+				<Form
+				  onSubmit={onSubmit}
+				  someArbitraryOtherProp={42} //non-API prop
+
+				  //prop render, nota que recibe una 'arrow function'
+				  render={props => {
+				    console.log(props.someArbitraryOtherProp) // would print 42, es decir, puedes acceder a todas las props de <Form/>
+				    return <form onSubmit={props.handleSubmit}> ... </form> //aquí se definen los campos y botones del formulario
+				  }}
+				/>
+
+			<Field/>, registra un campo en el form que lo contiene, lo 'suscribe' al estado de los campos e 'inyecta' el estado y las funciones callback: onBlur, onChange, y onFocus por medio de una prop render.
+
+			Para usar <Field/> necesitas tres cosas:
+				1. Definir una prop 'name'
+				2. Definir la forma de pintar el campo (similar a <Form/>, puedes pintar un HTML 'vanilla', un componente react, como componente input, etc.)
+				3. Conectar las funciones 'callback' del campo con la entrada del usuario, depende del método elegido en el paso 2.
+					<Field name="myField" component="input" />
+
+					'or'
+
+					<Field name="myField">
+					  {props => (
+					    <div>
+					      <input {...props.input} />
+					    </div>
+					  )}
+					</Field>
+
+					'Or' a mano si estás usando una prop 'render'.
+
+			En https://final-form.org/docs/react-final-form/api/Field están todas las props que pueden recibir, las más comunes son:
+
+				name: obligatoria, el identificador del campo
+
+				Una entre component, render, or children: obligatoria, para pintar el campo, se recomienda usar un componente, a la hora de pintar el campo hay que pasarle las variables input (entrada de usuario) y meta (usada para validar) para que funcione.
+
+				<Field name="username">
+	                {
+	                //nota que es una arrow function (args) => {//function content}
+	                ({ input, meta }) => (
+	                <div>
+	                    <label>Username</label>
+	                    <input {...input} type="text" placeholder="Username" />
+	                    {/* 'condition && <p>markup</p>', al parecer la condición trae un 'and' en el primer && 
+	                        en pocas palabras, si encuentra valores en las dos variables meta, pinta el error en un <span>*/}
+	                    {meta.error && meta.touched && <span>{meta.error}</span>}
+	                </div>
+	                )}
+	            </Field>
+
+	    SOBRE MATERIAL-UI
+	    Encontré full de problemas para integrar react-final-form con SemanticUI, así que nos cambiamos a material-ui, el problema es que todo el layout existente se rompió, se tuvo que reescribir todo el código hasta la fecha (T.T), el primer obstáculo fué hacer que react-router se llevara con el menú de material UI, y aquí está el truco:
+
+	    Cómo linkear react-router con menú de material-ui
+	    	Lo primero es ver cómo son los menús: Además de tener un wrapper que define las propiedades del Menú (dato random, el wrapper es el componente <Menu>), debes definir los handler del botón que despliege los enlaces, porque igual que bootstrap, material-ui está diseñado con la filosofía 'mobile-first', el menú por default funciona parecido a los menús de apps móviles (un botoncito despliega los enlaces). Luego defines los enlaces y ya estás listo:
+
+	    		import React from 'react';
+				import Button from '@material-ui/core/Button';
+				import Menu from '@material-ui/core/Menu';
+				import MenuItem from '@material-ui/core/MenuItem';
+
+				export default function SimpleMenu() {
+				  //los handler del botón que despliegan el contenido del menú
+				  const [anchorEl, setAnchorEl] = React.useState(null);
+
+				  const handleClick = (event) => {
+				    setAnchorEl(event.currentTarget);
+				  };
+
+				  const handleClose = () => {
+				    setAnchorEl(null);
+				  };
+
+				  return (
+				  	//El botón, nota el onClick que llama al handler definido arriba
+				    <div>
+				      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+				        Open Menu
+				      </Button>
+
+				      //Componente menú, con sus props, nota las props anchorEl, open y onClose
+				      <Menu
+				        id="simple-menu"
+				        anchorEl={anchorEl}
+				        keepMounted
+				        open={Boolean(anchorEl)}
+				        onClose={handleClose}
+				      >
+				      	//los items del menú, ignora el onClick porque lo vamos a sobreescribir para que funcione con react-router
+				        <MenuItem onClick={handleClose}>Profile</MenuItem>
+				        <MenuItem onClick={handleClose}>My account</MenuItem>
+				        <MenuItem onClick={handleClose}>Logout</MenuItem>
+				      </Menu>
+				    </div>
+				  );
+				}
+
+			Sigue la integración con react-router: Para eso viene bien la documentación sobre 'composición' (en las fuentes). Como puedes ver, el truco está en ponerle un 'alias' (así les digo yo lol, aludiendo a ese concepto en SQL) a el componente <Link> de react-router.
+
+			No te olvides que en react-router, los componentes <Link> pintan el enlace y reciben la prop que le indica a router qué ruta pintar en el onClick
+				...
+				 <Router>
+			      <div>
+			        <ul>
+			          <li>
+			            <Link to="/">Home</Link> //Este es el Link de react-router
+			          </li>
+			   	...
+
+			Pues que material-ui también tiene un componente <Link> aunque solo es un enlace bonito sin handlers ni nada, para agregarle las funcionalidades de react-router podemos usar la capacidad de 'composición' de los componentes de esa librería.
+
+			En pocas palabras, le puedes decir al componente que pinte otro componente dentro de él y así puedes incorporar toda las funcionalidades de otros componentes a la UI bonita de los componentes de material-ui.
+
+			Esto se ve así:
+
+				/* eslint-disable jsx-a11y/anchor-is-valid */
+				import React from 'react';
+				import { MemoryRouter as Router } from 'react-router';
+				import { Link as RouterLink } from 'react-router-dom'; //Nota el 'alias' del <Link> de react-router
+				import Link from '@material-ui/core/Link'; //Nota que llamamos al <Link> de material-ui
+
+				//no le hagas caso a esta, no la ocupamos
+				const LinkBehavior = React.forwardRef((props, ref) => (
+				  <RouterLink ref={ref} to="/getting-started/installation/" {...props} />
+				));
+
+				export default function LinkRouter() {
+				  return (
+				  	//wrapper de react-router
+				    <Router>
+				      <div>
+				      	//Esto es lo que nos interesa, Link llama a RouterLink con la prop 'component' (checa el import arriba) y le pasa la ruta, 
+				      	//luego la puedes definir en el switch de rutas e implementar la navegación completa.
+				        <Link component={RouterLink} to="/">
+				          With prop forwarding
+				        </Link>
+				        <br />
+				        <Link component={LinkBehavior}>Without prop forwarding</Link>
+				      </div>
+				    </Router>
+				  );
+				}
+
+			Para el proyecto que nos ocupa, el menú quedó así:
+
+				//robado de los docs de material-ui lol
+				function SimpleMenu() {
+				  //handlers
+				  const [anchorEl, setAnchorEl] = React.useState(null);
+
+				  const handleClick = (event) => {
+				    setAnchorEl(event.currentTarget);
+				  };
+
+				  const handleClose = () => {
+				    setAnchorEl(null);
+				  };
+
+				  return (
+				    <div>
+				      //botón para desplegar los enlaces
+				      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+				        Open Menu
+				      </Button>
+
+				      //el menú con sus props
+				      <Menu
+				        id="simple-menu"
+				        anchorEl={anchorEl}
+				        keepMounted
+				        open={Boolean(anchorEl)}
+				        onClose={handleClose}
+				      >	
+				      	/*aquí está el truco, nota como cada <MenuItem> llama a un <Link> de material-ui, que a su vez llama a un <RouterLink>,
+				      	* que a su vez (XD) es un <Link> de react-router, y así puede llamar a las rutas definidas en el <Switch> de react-router
+				      	*/
+				        <MenuItem onClick={handleClose}> <Link component={RouterLink} to="/">Contacts List</Link> </MenuItem>
+				        <MenuItem onClick={handleClose}> <Link component={RouterLink} to="/contacts/new">Add Contact</Link> </MenuItem>
+				      </Menu>
+
+				      /*Robado del ejemplo básico de react-router, aquí le dices al router qué rutas puede pintar y a quién llamar cuando haga
+				      * falta
+				      */
+				      <Switch>
+				        <Route exact path="/" component={ContactListPage}/>
+				        <Route path="/contacts/new" component={ContactFormPage}/>
+				        <Route path="/contacts/edit/:_id" component={ContactFormPage}/>
+				      </Switch>
+				    </div>
+				  );
+				}
+
+    	Fuentes: 
+    			https://material-ui.com/components/menus/
+    			https://material-ui.com/guides/composition/
+    			https://reactrouter.com/web/example/basic
+    			https://youtu.be/rl4TgzcaLe0 (no garantizo que funcione siempre lol)
+
+	    Luego está el hecho de que el layout original estaba en tabs, y la verdad me gustaba la idea de verla así, entonces cambiamos el menú (en pocas palabras todo el código anterior no se va a usar T.T) y pusimos la navegación principal en tabs.
+
+	    Cómo integrar un layout de tabs (material-ui) con react-router
+	    Las tab básicas funcionan así:
+
+	    	<AppBar position="static"> //Es la barra con algún color en donde aparecen las tabs
+			  <Tabs value={value} onChange={handleChange} aria-label="simple tabs example"> //contenedor de tabs
+			    <Tab label="Item One" {...a11yProps(0)} /> //las tabs, nota que solo necesitan una label y reciben jsx (dentro de las {})
+			    <Tab label="Item Two" {...a11yProps(1)} />
+			    <Tab label="Item Three" {...a11yProps(2)} />
+			  </Tabs>
+			</AppBar>
+			<TabPanel value={value} index={0}> //Aquí especificarías qué componente pintar
+			  Item One
+			</TabPanel>
+			<TabPanel value={value} index={1}>
+			  Item Two
+			</TabPanel>
+
+		Vamos a reemplazar <TabPanel> por react router, lo que quedaría así:
+
+			<div className="App">
+		      <BrowserRouter> //Como usaremos react-router, necesitas encerrar todo en browserRouter
+		        <Route /* Pintas una ruta por default (véase la prop 'path'), 
+		        	   *  nota cómo recibe una arrow function en la prop render, en esa función especificas todas las tabs
+		        	   */
+		          path="/"
+		          render={(history) => (
+		            <AppBar> //La barra de color
+		              <Tabs /* contenedor de tabs, nota la prop value (requerida según la doc), que le permite a react saber qué 
+		              		*  tab se está pintando por medio de la prop 'history', dicha prop es usable debido a que estamos pintando
+		              		*  las tabs desde la prop 'render' de un componente <Route> (https://reactrouter.com/web/api/Route/render-func)
+		              		*  al usar el historial del dom puedes decirle a Tabs, qué tab está siendo renderizada
+		              		*  por eso el operador ternario: Si no estás pintando "/", 'value' será la ruta 'react-router' en la que estés
+		              		*  si por otro lado estás en "/" entonces 'value' será 'false' y en las tabs no se va a resaltar nada.
+		              		*  Por cierto que quité el operador en dev para que se resalte la tab en "/"
+		              		*/
+		                value={
+		                  history.location.pathname !== "/"
+		                    ? history.location.pathname
+		                    : false
+		                }
+		              >
+		                {console.log(history.location.pathname)}
+		                <Tab /* las tab individuales, nota que usan la prop 'component' para llamar a un 'Link' de react-router, 
+		                     *  estamos usando composición de componentes ;)
+		                     */
+		                  value={routes[0]}
+		                  label="books"
+		                  component={Link}
+		                  to={routes[0]}
+		                />
+		                <Tab
+		                  value={routes[1]}
+		                  label="Favorites"
+		                  component={Link}
+		                  to={routes[1]}
+		                />
+		              </Tabs>
+		            </AppBar>
+		          )}
+		        />
+
+		       	//yyyy, en el switch defines los componentes a pintar según la ruta llamada
+		        <Switch>
+		          <Route path="/books" component={Books} />
+		          <Route path="/favorites" component={Favorites} />
+		        </Switch>
+		      </BrowserRouter>
+		    </div>
+
+	    Usando el ejemplo anterior, el componente del menú quedó así (se asume que quien lo llame lo ponga dentro de una instancia de BrowserRouter):
+
+		    function TabsMenu() {
+			  const routes = ["/", "/contacts/new", "contacts/edit/:_id"];
+
+			  return (
+			    <Container className="App"> //container de material-ui
+			      <Route
+			        path="/"
+			        render={(history) => (
+			          <AppBar>
+			            <Tabs
+			              centered
+			              value={
+			                history.location.pathname !== "/"
+			                  ? history.location.pathname
+			                  : false
+			              }
+			            >
+			              {/*console.log(history.location.pathname)*/}
+			              <Tab
+			                value={routes[0]}
+			                label="Contacts"
+			                component={RouterLink}
+			                to={routes[0]}
+			              />
+			              <Tab
+			                value={routes[1]}
+			                label="Add Contact"
+			                component={RouterLink}
+			                to={routes[1]}
+			              />
+			            </Tabs>
+			          </AppBar>
+			        )}
+			      />
+
+			      <Switch>
+			        <Route exact path="/" component={ContactListPage}/>
+			        <Route path="/contacts/new" component={ContactFormPage}/>
+			        <Route path="/contacts/edit/:_id" component={ContactFormPage}/>
+			      </Switch>
+			    </Container>
+			  );
+			}
+
+	    	Fuentes:
+	    			https://material-ui.com/components/tabs/
+	    			https://stackoverflow.com/questions/41638688/material-uis-tabs-integration-with-react-router-4/41654699
+	    			https://reactrouter.com/web/api/Route/render-func
+	    			https://www.youtube.com/watch?v=voNhE4vNFa4 (videazo BTW)
 
 Comandos
 	MONGODB
@@ -519,7 +902,6 @@ Comandos
 	API
 	API test: Consola en \backend, "yarn test" (lol)
 	API run: Consola en \backend, "yarn start"
-	APP run: Consola en \, "yarn start"
 
 	REACT
 	Start APP: Consola en \, "yarn start"

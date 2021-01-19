@@ -5,7 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { BrowserRouter } from 'react-router-dom';
-import 'semantic-ui-css/semantic.min.css';
+import CssBaseline from '@material-ui/core/CssBaseline';
+// import 'semantic-ui-css/semantic.min.css';
 
 import { Provider } from 'react-redux';
 import store from "./store"
@@ -13,6 +14,7 @@ import store from "./store"
 ReactDOM.render(
   <BrowserRouter>
     <Provider store={ store }>
+      <CssBaseline />
       <App/>
     </Provider>
   </BrowserRouter>,

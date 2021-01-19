@@ -1,5 +1,5 @@
 import React from 'react';
-import { CardGroup } from 'semantic-ui-react';
+// import { CardGroup } from 'semantic-ui-react';
 import ContactCard from './contact-card';
 
 export default function ContactList({contacts}){
@@ -14,9 +14,9 @@ export default function ContactList({contacts}){
 
     return (
         <div>
-            <CardGroup>
+            {/* <CardGroup> */}
                 { cards() }
-            </CardGroup>
+            {/* </CardGroup> */}
         </div>
     )
 }

@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.error {
+  color: #9f3a38;
+}
+
+/* .horiz-menu > div {
+  display: inline-block;
+} */
+
+.App {
+  margin-top: 10vh;
+}

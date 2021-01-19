@@ -1,25 +1,68 @@
 import React, { Component } from 'react';
-import { NavLink, Route } from 'react-router-dom';
-import { Container } from 'semantic-ui-react';
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link as RouterLink
+} from "react-router-dom";
+
+import Container from '@material-ui/core/Container';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import AppBar from '@material-ui/core/AppBar';
+
 import ContactListPage from './pages/contact-list-page';
 import ContactFormPage from './pages/contact-form-page';
+
+function TabsMenu() {
+  const routes = ["/", "/contacts/new", "contacts/edit/:_id"];
+
+  return (
+    <Container className="App">
+      <Route
+        path="/"
+        render={(history) => (
+          <AppBar>
+            <Tabs
+              centered
+              value={
+                history.location.pathname
+              }
+            >
+              {/*console.log(history.location.pathname)*/}
+              <Tab
+                value={routes[0]}
+                label="Contacts"
+                component={RouterLink}
+                to={routes[0]}
+              />
+              <Tab
+                value={routes[1]}
+                label="Add Contact"
+                component={RouterLink}
+                to={routes[1]}
+              />
+            </Tabs>
+          </AppBar>
+        )}
+      />
+
+      <Switch>
+        <Route exact path="/" component={ContactListPage}/>
+        <Route path="/contacts/new" component={ContactFormPage}/>
+        <Route path="/contacts/edit/:_id" component={ContactFormPage}/>
+      </Switch>
+    </Container>
+  );
+}
 
 class App extends Component {
   render() {
     return (
-      <Container>
-        <div className="ui two item menu">
-          <NavLink className="item" activeClassName="active" exact to="/">
-            Contacts List
-          </NavLink>
-          <NavLink className="item" activeClassName="active" exact to="/contacts/new">
-            Add Contact
-          </NavLink>
-        </div>
-        <Route exact path="/" component={ContactListPage}/>
-        <Route path="/contacts/new" component={ContactFormPage}/>
-        <Route path="/contacts/edit/:_id" component={ContactFormPage}/>
-      </Container>
+      <Router>
+        <TabsMenu/>
+      </Router>
     );
   }
 }
