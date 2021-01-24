@@ -40,6 +40,9 @@ Formulario (está densoooo T.T), desinstalamos semantic-ui-react y semantic-ui-c
 15-19/01/2020
 Reescribir componentes para material-ui
 
+20-21/01/2020
+Construcción de formulario y validación por el front-end
+
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
 
@@ -142,12 +145,7 @@ SUMARIO PROYECTO CONTACTOS
                 
                 contact-reducer.js, ahora tiene los casos adecuados para las action creadas en el paso anterior
                 
-                ContactForm (/components/contact-form) ahora tiene el layout de un formulario (react-final-form)
-
-                VAS AQUI: Hay que arreglar todos los componentes para que usen material-ui, luego puedes seguir con el formulario.
-
-                		https://material-ui.com/getting-started/example-projects/
-                		https://codesandbox.io/s/react-final-form-material-ui-example-tqv09?file=/src/index.jsx
+                ContactForm (/components/contact-form) ahora tiene el layout de un formulario (react-final-form + material-ui), y validación poderosa (usando yup + react-final-form), y llama a axios para insertar en la BD.
 
 		Notas sobre integración:
 		
@@ -894,6 +892,76 @@ SUMARIO PROYECTO CONTACTOS
 	    			https://stackoverflow.com/questions/41638688/material-uis-tabs-integration-with-react-router-4/41654699
 	    			https://reactrouter.com/web/api/Route/render-func
 	    			https://www.youtube.com/watch?v=voNhE4vNFa4 (videazo BTW)
+
+	    SOBRE REACT-FINAL-FORM Y MATERIAL UI
+	    Para integrar un formulario de final-form con los componentes bonitos de material ui necesitas otro paquete (bruhhhh, ya para).
+	    Se trata de https://github.com/lookfirst/mui-rff, instalas todo con:
+	    	
+	    	yarn add mui-rff @material-ui/core @material-ui/pickers@3.x.x @material-ui/lab final-form react-final-form
+
+	    Nota que va react-final-form, el core de material-ui, y alguna otra dependencia que no sé muy bien qué hace.
+
+	    El uso sugerido de la librería está en la documentación (enlace de github anterior) y en el ejemplo de integración en: https://codesandbox.io/s/react-final-form-material-ui-example-tqv09?file=/src/index.jsx.
+
+	    Una parte importante de los formularios es la validación de entradas, puedes construir un validador a mano y pasárselo al componente material-ui para cachar cosas muy específicas, eso es más o menos laborioso.
+
+	    Por eso tenemos otra librería (¬_¬).
+
+	    Yup (https://github.com/jquense/yup) es un constructor de esquemas de 'parsing' y validación, y es fácilmente integrable con mui-rff.
+
+	   	Lo instalas con:
+
+	   		yarn add yup @types/yup
+
+	    La cosa se ve así:
+
+	    	import { Form } from 'react-final-form';
+			import { makeValidate } from 'mui-rff'; //importante
+			import * as Yup from 'yup';
+
+			// We define our schema based on the same keys as our form:
+			const schema = Yup.object().shape({
+			  employed: Yup.boolean().required(),
+			});
+
+			// Run the makeValidate function...
+			const validate = makeValidate(schema);
+
+			// Then pass the result into the <Form/>...
+			<Form validate={validate}>
+			  <Checkboxes name="employed" required={true} data={{ label: 'Employed', value: true }} />
+			</Form>
+
+		Y ya tienes bien validado tu formulario (en el front, no te olvides de validar en el backend).
+
+		SOBRE ERRORES EN POST AXIOS
+		La request generada dió muchos problemas. El detalle estaba en el número de teléfono, lo descubrí agregando err.response al catch de la request (https://stackoverflow.com/questions/60120909/axios-400-bad-request-in-react):
+
+			const onSubmit = async values => {
+		        const fName = values.firstName;
+		        const lName = values.lastName;
+		        const uPhone = values.phone;
+		        const uMail = values.email;
+
+		        const body = {
+		            "name": {
+		                "first": fName,
+		                "last": lName
+		            },
+		            "phone": uPhone,
+		            "email": uMail
+		        };
+
+		        // console.log(body);
+		        client.post(url, body)
+		        .then(
+		            window.alert("Contact added")
+		        )
+		        .catch(err => console.log(err.response));
+
+    		}
+
+    	Feathers solo acepta números así: +5555555555 (diez dígitos y el +). Hay que editar la expresión regular de Yup para el teléfono, pero fuera de eso, todo va bien, ya se inserta en la BD (:o), aunque no usamos nada de redux para el formulario.
 
 Comandos
 	MONGODB
