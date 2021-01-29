@@ -28,6 +28,24 @@ export function saveContact(contact) {
         })
     }
 }
+
+export function fetchContact(_id) {
+    return dispatch => {
+      return dispatch({
+        type: 'FETCH_CONTACT',
+        payload: client.get(url+'/'+_id)
+      })
+    }
+}
+  
+export function updateContact(contact) {
+    return dispatch => {
+      return dispatch({
+        type: 'UPDATE_CONTACT',
+        payload: client.put(`${url}/${contact._id}`, contact)
+      })
+    }
+}
 /**
  * Primero importas los objetos 'contact', en la primera versión llamas al archivo contact-data, eventualmente vas a llamar a la API (supongo)
  * Sí, ahora llamas a la conexión (actions/index.js) y luego la usas en payload pasándole la url 'contacts', no olvides que esa es la url de 

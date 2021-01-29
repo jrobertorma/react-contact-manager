@@ -21,7 +21,34 @@ import { client } from '../actions/'; //llamas a actions/index.js, la conexión 
 
 const url = '/contacts';
 
-class ContactForm extends Component {
+class UpdateContactForm extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+        data: {},
+        contactId: ''
+    };
+  }
+
+  componentDidMount() {
+    const _id = this.props.contactId;
+    client.get(url+'/'+_id)
+        .then((response) => {
+            const contactData = {
+                firstName: response.data.name.first,
+                lastName: response.data.name.last,
+                phone: response.data.phone,
+                email: response.data.email
+            }
+
+            this.setState({ data: contactData, contactId : _id })
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        })
+  }
 
   render() {
     //const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -41,10 +68,9 @@ class ContactForm extends Component {
             "email": uMail
         };
 
-        // console.log(body);
-        client.post(url, body)
+        client.put(`${url}/${this.state.contactId}`, body)
         .then(
-            window.alert("Contact added")
+            window.alert("Contact has been updated")
         )
         .catch((err) => { window.alert("There was an error, please check your input"); console.log(err.response) } );
     }
@@ -110,12 +136,13 @@ class ContactForm extends Component {
 
     return (
         <div>
-            <h1 style={{marginTop:"1em"}}>Add New Contact</h1>
+            <h1 style={{marginTop:"1em"}}>Update Contact</h1>
             <Form
                 onSubmit={onSubmit}
+                initialValues={this.state.data}
                 validate={validate}
                 render={({ handleSubmit, form, submitting, pristine, values }) => (
-                <form onSubmit={ event => { handleSubmit().then(form.reset) } } noValidate>
+                <form onSubmit={ event => { handleSubmit() } } noValidate>
                     <Paper style={{ padding: 16 }}>
                         <Grid container alignItems="flex-start" spacing={2}>
                             {formFields.map((item, idx) => (
@@ -154,7 +181,7 @@ class ContactForm extends Component {
   }
 }
 
-export default ContactForm;
+export default UpdateContactForm;
 
 /**
  * Inicialmente tendrías que usar redux-form y llamar a un action, pero integrarlo con la UI daba problemas y decidí usar materialui
@@ -176,4 +203,21 @@ export default ContactForm;
  * defines el <Form> de rff, nota cómo llama a todas las cosas antes definidas, dato interesante es el argumento del onSubmit
  * esa 'arrow function' permite definir el comportamiento del formulario una vez la operación del insert ha conluido, en este caso
  * resetear los campos.
+ * 
+ * La principal diferencia de este formulario respecto a contact-form.js es el constructor (donde inicializamos los estados data y contactId, 
+ * vacíos al principio).
+ * 
+ * El método del lifecycle de react, componentDidMount, donde llamamos a la API y guardamos los datos de la BD correspondientes al id, (nota 
+ * que lo envíamos desde pages/update-contact-page y es que lo recibe desde las rutas definidas en app.js, en realidad todo este proceso es
+ * llamado desde components/contact-card.js) con: const _id = this.props.contactId;, actualizamos el state con los datos obtenidos
+ * 
+ * El <Form> ahora tiene la prop initialValues={this.state.data}, que llama al estado recién llenado y le pasa esos valores a los campos del
+ * formulario, ;)
+ * 
+ * y la modificación del onSubmit. Que ahora llama al método PUT de axios
+ * 
+ *   client.put(`${url}/${this.state.contactId}`, body)
+ *
+ * que actualiza el registro con el id especificado. 
+ * 
  */

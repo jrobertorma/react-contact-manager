@@ -31,17 +31,20 @@ Archivos para redux y sus dependencias.
 26-31/12/2020
 Conectar redux y react, la conexión está lista. Se modificó el componente que pinta contactos, ahora tiene cards de react-ui.
 
-01-04/01/2020
+01-04/01/2021
 Conectar con la API y actualizar los archivos relacionados con 'fetchContacts'.
 
-04-14/01/2020
+04-14/01/2021
 Formulario (está densoooo T.T), desinstalamos semantic-ui-react y semantic-ui-css para usar Material-UI (verás las razones en las notas de los formularios).
 
-15-19/01/2020
+15-19/01/2021
 Reescribir componentes para material-ui
 
-20-21/01/2020
-Construcción de formulario y validación por el front-end
+20-25/01/2021
+Construcción de formulario y validación por el front-end y back-end
+
+26/01/2021
+Implementar funcionalidad del botón 'Actualizar'
 
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
@@ -146,6 +149,10 @@ SUMARIO PROYECTO CONTACTOS
                 contact-reducer.js, ahora tiene los casos adecuados para las action creadas en el paso anterior
                 
                 ContactForm (/components/contact-form) ahora tiene el layout de un formulario (react-final-form + material-ui), y validación poderosa (usando yup + react-final-form), y llama a axios para insertar en la BD.
+
+            4.4.3 Implementar 'Actualización' de contactos
+
+
 
 		Notas sobre integración:
 		
@@ -957,11 +964,87 @@ SUMARIO PROYECTO CONTACTOS
 		        .then(
 		            window.alert("Contact added")
 		        )
-		        .catch(err => console.log(err.response));
-
+		        .catch(err => console.log(err.response));//aquí mero XD
     		}
 
-    	Feathers solo acepta números así: +5555555555 (diez dígitos y el +). Hay que editar la expresión regular de Yup para el teléfono, pero fuera de eso, todo va bien, ya se inserta en la BD (:o), aunque no usamos nada de redux para el formulario.
+    	Feathers solo acepta números así: +5555555555 (diez dígitos y el +). Hay que editar la expresión regular de Yup para el teléfono, pero fuera de eso, todo va bien, ya se inserta en la BD (:o), aunque no usamos nada de redux para el formulario, esto cuenta como validación del lado del servidor XD, en realidad feathers hizo todo, atento al definir los modelos, no olvides hacer pruebas de llamadas incorrectas desde postman para cubrir todas las posibilidades.
+
+    		No valida que los correos sean únicos
+    		No valida que los teléfonos sean únicos
+
+    	SOBRE UPDATE
+    	Originalmente usarías nuevos dispatchs, action creators y casos en la función reducer, pero como cambiamos por completo la forma en que el formulario de alta funciona, no se va a poder, de nuevo estamos en aguas desconocidas.
+
+	    	Lo primero a lograr es que el formulario pueda recibir argumentos y pintarlos en los campos
+	    		Para eso ocupas el componentDidMount en UpdateContactForm, se ve así en el código:
+
+	    		  componentDidMount() {
+				    const _id = this.props.contactId; //recibes el id por las props
+				    client.get(url+'/'+_id) //llamas el get de axiso para el id especificado
+				    	//por algún motivo extraño (de scope probablemente), es necesario que uses
+				    	//una arrow function en el then ( response )=>{ //yoyoyo } IMPORTANTE
+				        .then((response) => {
+				        	//construyes el objeto que va a llenar los campos
+				            const contactData = {
+				                firstName: response.data.name.first,
+				                lastName: response.data.name.last,
+				                phone: response.data.phone,
+				                email: response.data.email
+				            }
+
+				            //pasas el id y el objeto al estado, para poder usarlo en todo el componente
+				            this.setState({ data: contactData, contactId : _id })
+				        })
+				        .catch(function (error) {
+				            // handle error
+				            console.log(error);
+				        })
+				  }
+
+	    	Luego que pueda detectar si se trata de un update (o de plano hacer otro componente ad hoc (ulala, don latino XD)).
+	    		Usamos otro componente, la card llama a <Link to= { "/contacts/edit/"+ contact._id } ><Button size="small">Edit</Button></Link>
+	    		en App.js la ruta para este caso es:
+	    			        <Route path="/contacts/edit/:_id" component={UpdateContactFormPage}/>
+
+	    		UpdateContactFormPage cacha el id desde su ruta con:
+	    			const { _id } = this.props.match.params; //IMPORTANTE
+	    		
+	    		y se lo pasa al form así 
+	    				<UpdateContactForm contactId={_id}/>
+
+	    		El form lo cacha en el componentDidMount() especificado antes.
+
+	    	Luego hacer el update
+	    		Eso va en el onSubmit de UpdateContactForm
+
+	    		const onSubmit = async values => {
+	    			//los valores de los campos en el form
+			        const fName = values.firstName;
+			        const lName = values.lastName;
+			        const uPhone = values.phone;
+			        const uMail = values.email;
+
+			        //construyes el cuerpo de la request
+			        const body = {
+			            "name": {
+			                "first": fName,
+			                "last": lName
+			            },
+			            "phone": uPhone,
+			            "email": uMail
+			        };
+
+			        //nota el put url/id, body, así le dices a axios que llame a la api
+			        // y que actualize el registro con id = contactId con los datos de body
+			        client.put(`${url}/${this.state.contactId}`, body)
+			        .then(
+			            window.alert("Contact has been updated")
+			        )
+			        .catch((err) => { window.alert("There was an error, please check your input"); console.log(err.response) } );
+			    }
+
+			Y yaaaaaa, así queda el update, ahora sigue el delete.
+
 
 Comandos
 	MONGODB

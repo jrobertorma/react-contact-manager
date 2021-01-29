@@ -14,9 +14,10 @@ import AppBar from '@material-ui/core/AppBar';
 
 import ContactListPage from './pages/contact-list-page';
 import ContactFormPage from './pages/contact-form-page';
+import UpdateContactFormPage from './pages/update-contact-form-page';
 
 function TabsMenu() {
-  const routes = ["/", "/contacts/new", "contacts/edit/:_id"];
+  const routes = ["/", "/contacts/new", "/contacts/edit/:_id"];
 
   return (
     <Container className="App">
@@ -51,7 +52,7 @@ function TabsMenu() {
       <Switch>
         <Route exact path="/" component={ContactListPage}/>
         <Route path="/contacts/new" component={ContactFormPage}/>
-        <Route path="/contacts/edit/:_id" component={ContactFormPage}/>
+        <Route path="/contacts/edit/:_id" component={UpdateContactFormPage}/>
       </Switch>
     </Container>
   );
