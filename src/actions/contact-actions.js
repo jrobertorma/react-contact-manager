@@ -46,6 +46,16 @@ export function updateContact(contact) {
       })
     }
 }
+
+export function deleteContact(_id) {
+    return dispatch => {
+      return dispatch({
+        type: 'DELETE_CONTACT',
+        payload: client.delete(`${url}/${_id}`)
+      })
+    }
+}
+
 /**
  * Primero importas los objetos 'contact', en la primera versión llamas al archivo contact-data, eventualmente vas a llamar a la API (supongo)
  * Sí, ahora llamas a la conexión (actions/index.js) y luego la usas en payload pasándole la url 'contacts', no olvides que esa es la url de 

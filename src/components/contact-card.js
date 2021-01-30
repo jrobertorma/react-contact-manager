@@ -38,7 +38,11 @@ export default function ContactCard( {contact, deleteContact} ) {
             </CardContent>
             <CardActions>
                 <Link to= { "/contacts/edit/"+ contact._id } ><Button size="small">Edit</Button></Link>
-                <Button size="small">Delete</Button>
+                <Button size="small" 
+                    onClick={ () => deleteContact(contact._id) }
+                >
+                    Delete
+                </Button>
             </CardActions>
         </Card>
     )
