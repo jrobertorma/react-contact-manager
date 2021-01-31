@@ -151,6 +151,10 @@ SUMARIO PROYECTO CONTACTOS
                 ContactForm (/components/contact-form) ahora tiene el layout de un formulario (react-final-form + material-ui), y validación poderosa (usando yup + react-final-form), y llama a axios para insertar en la BD.
 
             4.4.3 Implementar 'Actualización' de contactos
+            	Se hizo sin redux, con un formulario único para update que en el handler tiene una llamada PUT a axios y que es llenado automáticamente por medio de props y llamadas a la API en componentDidMount(); 
+
+            4.4.4 Implementar 'Borrado' de contactos
+            	Se hizo con redux. 
 
 
 
@@ -980,7 +984,7 @@ SUMARIO PROYECTO CONTACTOS
 
 	    		  componentDidMount() {
 				    const _id = this.props.contactId; //recibes el id por las props
-				    client.get(url+'/'+_id) //llamas el get de axiso para el id especificado
+				    client.get(url+'/'+_id) //llamas el get de axios para el id especificado
 				    	//por algún motivo extraño (de scope probablemente), es necesario que uses
 				    	//una arrow function en el then ( response )=>{ //yoyoyo } IMPORTANTE
 				        .then((response) => {
@@ -1045,6 +1049,50 @@ SUMARIO PROYECTO CONTACTOS
 
 			Y yaaaaaa, así queda el update, ahora sigue el delete.
 
+		SOBRE DELETE
+			Las card van a hacer todo el trabajo en el front en este caso.
+
+			Recordarás que para construirlas vamos así:
+
+			Primero App.js llama a ContactListPage.js en la ruta '/', este componente importa los dispatch ya listos para ser llamados desde contact-actions.js, ejecuta el que trae todos los contactos de la BD y se los pasa junto al dispatch del delete (este es nuevo) a la fábrica de tarjetas que es contact-list.js, nota que usa mapDispatchToProps para poder hacerlo (después de todo son dispatchs lol, revisa la documentación para la función 'connect' en redux).
+
+			El dispatch del delete se ve así (va en contact-actions.js):
+
+				export function deleteContact(_id) {
+				    return dispatch => {
+				      return dispatch({
+				        type: 'DELETE_CONTACT',
+				        payload: client.delete(`${url}/${_id}`)
+				      })
+				    }
+				}
+
+			La fábrica de tarjetas le pasa los datos de cada contacto y el dispatch del delete a cada nueva card.
+
+			Por último se actualizan las cards para que en el botón de borrar se llame al dispatch del delete con el id del contacto que está pintando.
+
+				<Button size="small" 
+                    onClick={ () => deleteContact(contact._id) }
+                >
+                    Delete
+                </Button>
+
+            Llamar al dispatch que está enlazado con el store (por el connect en ContactListPage, atento ahí, esa vaina es importante), llama a la API que hace el delete y en su response se activa la función reducer (en contact-reducer.js) que ahora incorpora las posibles respuestas en el switch.
+
+            	//esto es lo que devuelve client.delete(`${url}/${_id}`) cuando todo sale bien, si no es así se va al default del switch ;).
+            	case 'DELETE_CONTACT_FULFILLED': {
+		          const _id = action.payload.data._id;
+		          return {
+		            ...state,
+		            contacts: state.contacts.filter(item => item._id !== _id)
+		          }
+		        }
+
+		    Y así queda el delete.
+
+	Y así queda la integración del front y el back
+
+Y así queda el proyectooooo (aún falta acomodar colores y layouts, pero la funcionalidad ya quedó :D)
 
 Comandos
 	MONGODB
