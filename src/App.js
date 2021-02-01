@@ -16,10 +16,24 @@ import ContactListPage from './pages/contact-list-page';
 import ContactFormPage from './pages/contact-form-page';
 import UpdateContactFormPage from './pages/update-contact-form-page';
 
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import teal from '@material-ui/core/colors/teal';
+
+const greenTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#004d40',
+    },
+    secondary: teal,
+  },
+});
+
+
 function TabsMenu() {
   const routes = ["/", "/contacts/new", "/contacts/edit/:_id"];
 
   return (
+    <ThemeProvider theme={greenTheme}>
     <Container className="App">
       <Route
         path="/"
@@ -55,6 +69,7 @@ function TabsMenu() {
         <Route path="/contacts/edit/:_id" component={UpdateContactFormPage}/>
       </Switch>
     </Container>
+    </ThemeProvider>
   );
 }
 

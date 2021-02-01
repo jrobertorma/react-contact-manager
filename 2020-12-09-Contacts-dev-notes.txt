@@ -43,8 +43,14 @@ Reescribir componentes para material-ui
 20-25/01/2021
 Construcción de formulario y validación por el front-end y back-end
 
-26/01/2021
+26-29/01/2021
 Implementar funcionalidad del botón 'Actualizar'
+
+30/01/2021
+Implementar funcionalidad del botón 'Borrar'
+
+31/01/2021
+Documentar Proyecto 
 
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
@@ -155,8 +161,6 @@ SUMARIO PROYECTO CONTACTOS
 
             4.4.4 Implementar 'Borrado' de contactos
             	Se hizo con redux. 
-
-
 
 		Notas sobre integración:
 		
@@ -903,6 +907,40 @@ SUMARIO PROYECTO CONTACTOS
 	    			https://stackoverflow.com/questions/41638688/material-uis-tabs-integration-with-react-router-4/41654699
 	    			https://reactrouter.com/web/api/Route/render-func
 	    			https://www.youtube.com/watch?v=voNhE4vNFa4 (videazo BTW)
+
+	    Cómo modificar colores, tipografías y más en material-ui
+	    Puedes usar los 'themes' para personalizar los componentes creados con material-ui (https://material-ui.com/customization/theming/)
+	    Debes agregar 'styles' a las dependencias (https://material-ui.com/styles/basics/)
+
+	    	yarn add @material-ui/styles (no es necesario XD)
+
+	    Luego defines los estilos que necesites, primero vamos a probar los colores (https://material-ui.com/customization/color/#picking-colors) con:
+
+	    	import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+			import teal from '@material-ui/core/colors/teal';
+
+			const greenTheme = createMuiTheme({
+			  palette: {
+			    primary: {
+			      main: '#004d40',
+			    },
+			    secondary: teal,
+			  },
+			});
+
+		Los agregas al wraper ThemeProvider para que encierre a toda la app 
+
+			<ThemeProvider theme={greenTheme}>	
+
+		Y listo.
+
+		También puedes modificar los colores en componentes hijo con este método
+
+			https://stackoverflow.com/questions/46486565/material-ui-next-customize-button-colors
+			https://material-ui.com/customization/theming/
+			https://material-ui.com/customization/color/#playground
+
+
 
 	    SOBRE REACT-FINAL-FORM Y MATERIAL UI
 	    Para integrar un formulario de final-form con los componentes bonitos de material ui necesitas otro paquete (bruhhhh, ya para).
