@@ -936,11 +936,30 @@ SUMARIO PROYECTO CONTACTOS
 
 		También puedes modificar los colores en componentes hijo con este método
 
+			1. Importas ThemeProvider y createMuiTheme
+
+				import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+			2. Defines los colores del tema
+
+				const greenTheme = createMuiTheme({
+				    palette: {
+				      primary: {
+				        main: '#49a879',
+				        contrastText: "#fff", //Para que el texto sea blanco ;)
+				      }
+				    },
+				});
+
+			3. Agregas los colores al componente, nota el ThemeProvider rodeando al botón y la prop 'color' en el botón con 'primary' como su valor, así le dices a materialui que le ponga los colores primarios de la 'palette'.
+
+				<ThemeProvider theme={greenTheme}>
+                    <Button color="primary" variant="contained" size="small">Edit</Button>
+                </ThemeProvider>
+
 			https://stackoverflow.com/questions/46486565/material-ui-next-customize-button-colors
-			https://material-ui.com/customization/theming/
-			https://material-ui.com/customization/color/#playground
-
-
+			https://material-ui.com/customization/theming/ //cómo definir y aplicar temas
+			https://material-ui.com/customization/color/#playground //De aquí me robe los hexadecimales
 
 	    SOBRE REACT-FINAL-FORM Y MATERIAL UI
 	    Para integrar un formulario de final-form con los componentes bonitos de material ui necesitas otro paquete (bruhhhh, ya para).

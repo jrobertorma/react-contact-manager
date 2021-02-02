@@ -16,15 +16,16 @@ import ContactListPage from './pages/contact-list-page';
 import ContactFormPage from './pages/contact-form-page';
 import UpdateContactFormPage from './pages/update-contact-form-page';
 
-import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import teal from '@material-ui/core/colors/teal';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 const greenTheme = createMuiTheme({
   palette: {
     primary: {
-      main: '#004d40',
+      main: '#ff9800',
     },
-    secondary: teal,
+    secondary: {
+      main: '#fddf5d'
+    },
   },
 });
 

@@ -8,6 +8,8 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
@@ -17,6 +19,23 @@ const useStyles = makeStyles({
       marginTop: 10,
       marginBottom: 10,
     }
+});
+
+const redTheme = createMuiTheme({
+    palette: {
+      primary: {
+        main: '#ff5252',
+      }
+    },
+});
+
+const greenTheme = createMuiTheme({
+    palette: {
+      primary: {
+        main: '#49a879',
+        contrastText: "#fff",
+      }
+    },
 });
 
 export default function ContactCard( {contact, deleteContact} ) {
@@ -37,12 +56,16 @@ export default function ContactCard( {contact, deleteContact} ) {
                 </Typography>
             </CardContent>
             <CardActions>
-                <Link to= { "/contacts/edit/"+ contact._id } ><Button size="small">Edit</Button></Link>
-                <Button size="small" 
-                    onClick={ () => deleteContact(contact._id) }
-                >
-                    Delete
-                </Button>
+                <Link to= { "/contacts/edit/"+ contact._id } style={{ textDecoration: 'none' }}>
+                    <ThemeProvider theme={greenTheme}>
+                        <Button color="primary" variant="contained" size="small">Edit</Button>
+                    </ThemeProvider>
+                </Link>
+                    <ThemeProvider theme={redTheme}>
+                        <Button color="primary" variant="contained" size="small" onClick={ () => deleteContact(contact._id) }>
+                            Delete
+                        </Button>
+                    </ThemeProvider>
             </CardActions>
         </Card>
     )
