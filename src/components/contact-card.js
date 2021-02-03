@@ -8,6 +8,10 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 
+import PersonIcon from '@material-ui/icons/Person';
+import PhoneIcon from '@material-ui/icons/Phone';
+import AlternateEmailIcon from '@material-ui/icons/AlternateEmail';
+
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 
 import { Link } from 'react-router-dom';
@@ -38,6 +42,8 @@ const greenTheme = createMuiTheme({
     },
 });
 
+const iconsFontSize = "small";
+
 export default function ContactCard( {contact, deleteContact} ) {
     //let contact = props.contact;
     const classes = useStyles();
@@ -46,13 +52,13 @@ export default function ContactCard( {contact, deleteContact} ) {
         <Card className={classes.root}>
             <CardContent>
                 <Typography variant="body2" component="p">
-                    {contact.name.first} {contact.name.last}
+                    <PersonIcon fontSize={iconsFontSize}/> {contact.name.first} {contact.name.last}
                 </Typography>
                 <Typography variant="body2" component="p">
-                    {contact.phone}
+                    <PhoneIcon fontSize={iconsFontSize}/> {contact.phone}
                 </Typography>
                 <Typography variant="body2" component="p">
-                    {contact.email}
+                    <AlternateEmailIcon fontSize={iconsFontSize}/> {contact.email}
                 </Typography>
             </CardContent>
             <CardActions>

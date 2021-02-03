@@ -50,7 +50,10 @@ Implementar funcionalidad del botón 'Actualizar'
 Implementar funcionalidad del botón 'Borrar'
 
 31/01/2021
-Documentar Proyecto 
+Documentar Proyecto
+
+01-03/02/2021
+Agregar colores e íconos
 
 SUMARIO PROYECTO CONTACTOS
 	1. Crea el proyecto con create-react-app
@@ -960,6 +963,13 @@ SUMARIO PROYECTO CONTACTOS
 			https://stackoverflow.com/questions/46486565/material-ui-next-customize-button-colors
 			https://material-ui.com/customization/theming/ //cómo definir y aplicar temas
 			https://material-ui.com/customization/color/#playground //De aquí me robe los hexadecimales
+
+		Cómo agregar íconos de material-ui
+		Hay que instalarlos con: yarn add @material-ui/icons
+
+		Aquí está la lista de íconos: https://material-ui.com/components/material-icons/
+
+		Los importas y los pintas como componentes.
 
 	    SOBRE REACT-FINAL-FORM Y MATERIAL UI
 	    Para integrar un formulario de final-form con los componentes bonitos de material ui necesitas otro paquete (bruhhhh, ya para).
