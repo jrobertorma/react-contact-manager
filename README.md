@@ -1,3 +1,29 @@
+# React Contact manager
+
+## Requirements
+This project was created using React, Feathersjs, Redux and MongoDB, in order to make it work, besides downloading it and running `yarn start` you need to install mongodb and create a db with this kind of documents:
+
+(mongodb)
+
+## Use
+The first version does not have authentication. So after starting de db server, the backend app and the contacts app you will see the contacts in a card list view.
+
+(contact-list)
+
+You can edit or delete each contact by clicking on the correspondent buttons.
+
+(update-contact)
+
+You also can add new contacts by clicking on the 'Add contact' tab.
+
+(new-contact)
+
+And that is it.
+
+I used yarn to install each dependencies, so I'm leaving the readme comments about it's use.
+
+\
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
