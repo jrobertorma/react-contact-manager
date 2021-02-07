@@ -3,20 +3,20 @@
 ## Requirements
 This project was created using React, Feathersjs, Redux and MongoDB, in order to make it work, besides downloading it and running `yarn start` you need to install mongodb and create a db with this kind of documents:
 
-(mongodb)
+![mongodb](https://user-images.githubusercontent.com/37276129/107135292-1bd63f00-68bf-11eb-97d1-9f696653b9fa.JPG)
 
 ## Use
 The first version does not have authentication. So after starting de db server, the backend app and the contacts app you will see the contacts in a card list view.
 
-(contact-list)
+![contact-list](https://user-images.githubusercontent.com/37276129/107135303-31e3ff80-68bf-11eb-97f3-312fa79110eb.JPG)
 
 You can edit or delete each contact by clicking on the correspondent buttons.
 
-(update-contact)
+![update-contact](https://user-images.githubusercontent.com/37276129/107135310-43c5a280-68bf-11eb-9afa-96e0fb2a1de2.JPG)
 
 You also can add new contacts by clicking on the 'Add contact' tab.
 
-(new-contact)
+![new-contact](https://user-images.githubusercontent.com/37276129/107135315-53dd8200-68bf-11eb-974b-b854ff3e6d0b.JPG)
 
 And that is it.
 
